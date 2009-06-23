@@ -1,0 +1,13 @@
+{% if isEmpty(tasks) then %}
+	Нет задач удовлетворяющих запросу.
+{% else %}
+	{% local pageNav = include "_pagenav.html" %}
+	{{ pageNav }}
+	<table><thead><tr><td>Название</td><td>Статус</td><td>Исполнитель</td><td>Срок</td><td>Автор</td></tr></thead>
+	<tbody>
+	{% for _, task in ipairs(tasks) do %}
+		<tr{% if task.important and not task:isDone() then %} class="important"{% end %}><td>{{ task.title }}</td><td>{{ task.status or "" }}</td><td>{% if task.assignedTo then %}{{ task.assignedTo.name }}{% end %}</td><td>{% if task.dateToBeDone then %}{{ date("%d.%m.%Y", task.dateToBeDone) }} {{ task.timeToBeDone or "" }}{% end %}</td><td>{{ task.createdBy.name }}</td></tr>
+	{% end %}
+	</tbody></table>
+	{{ pageNav }}
+{% end %}
