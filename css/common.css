@@ -7,10 +7,15 @@ h1 {color:#FFF;font-size:12px;padding:5px 0 0 20px;font-weight:bold;font-family:
 th{background:none}
 ul{list-style-type:square}
 
-input[type="text"], input[type="password"], textarea, select {border:solid 1px #CCC;background-color:#FFF;padding:2px;color:#444}
 label {color:#444}
+input[type="text"], input[type="password"], textarea, select {border:solid 1px #CCC;background-color:#FFF;padding:2px;margin:2px 0;color:#444}
+input.date, input.time{width:80px !important}
+input.datetime{width:160px !important}
 input[type="text"].required, input[type="password"].required textarea.required, select.required {background-color:#FFD}
 input[disabled], textarea[disabled], select[disabled]{background-color:#DDD !important;color:#999 !important}
+
+input.textValue, select.textValue, textarea.textValue{background:none !important;border:none !important}
+input.error, select.error, textarea.error{background-color:#FDD !important;border:solid 1px #F00 !important;padding:2px;margin:2px 0}
 
 #info h1{color:#000;font-size:24px;padding:8px 0 0 0}
 #info h1 small{font-size:11px}
@@ -21,6 +26,8 @@ div.pages span{padding: 4px 8px;background:#FA0;margin-left:10px;color:#FFF}
 div.pages a{margin-left:10px;text-decoration:none}
 
 #tasks table{border-collapse:collapse}
-#tasks table td{border:solid 1px #CCC;background-color:#FFF;padding:8px}
+#tasks table td{border:solid 1px #CCC;background-color:#FFF;padding:0 4px}
 #tasks table tr.important td{background-color:#FDD !important}
-#tasks table thead tr td {font-weight:bold;background-color:#DFD}
+#tasks table tr.new td{background-color:#DFD !important}
+#tasks table tr.done td{background-color:#DDD !important}
+#tasks table thead tr td{font-weight:bold;background-color:#DDF;padding:8px 4px;text-align:center}

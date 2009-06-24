@@ -47,7 +47,7 @@ return {
 		end
 		local p = models.Paginator(app.models.Task, 10):order "-dateCreated"
 		local page = tonumber(luv:getGet "page") or 1
-		luv:assign{p=p;page=page;tasks=p:getPage(page):getValue()}
+		luv:assign{p=p;page=page;tasks=p:getPage(page)}
 		luv:display "_tasks.html"
 	end};
 	{false; function (urlConf)
