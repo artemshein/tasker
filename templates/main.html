@@ -1,32 +1,29 @@
 {[ extends "base.html" ]}
 
 {[ section "content" ]}
-<div id="info">
-<div class="user-info">Вы &mdash; {{ user }} [<a href="/logout">выйти &rarr;</a>]</div>
-<h1>Tasker <small>ver.{{ version }}</small></h1>
-</div>
 <div id="accordion">
 <h1><a href="#">Новая задача</a></h1>
 <div>
 	{% if createTaskForm:isSubmitted() and not createTaskForm:isValid() then %}
-		{{ include("_errors.html", {errors=createTaskForm:getErrors()}) }}
+		{{ include("_msgs-and-errors.html", {form=createTaskForm}) }}
 	{% end %}
 	{{ safe(createTaskForm) }}
 </div>
 <h1><a href="#">Список задач</a></h1>
 <div>
-	<a href="javascript:void(0)" onClick="loadTasks()">Обновить</a>
 	<div id="tasks"></div>
 	<script type="text/javascript" language="JavaScript">//<![CDATA[
-		function loadTasks ()
+		function showPage (page)
 		{
-			$.post("/ajax/tasks.html", {"find":"find"}, function (data)	{ $("#tasks").html(data); }, "html");
+			$.cookie("page", page, 60);
+			$.post("/ajax/tasks.html", {find: "Find", page: page}, function (data)	{ $("#tasks").html(data); }, "html");
 		}
-		loadTasks();
+		showPage($.cookie("page") || 1);
+		$("textarea.resizable").resizable();
 	//]]></script>
 </div>
 </div>
 <script type="text/javascript" language="JavaScript">//<![CDATA[
-	$("#accordion").accordion({active: 1});
+	$("#accordion").accordion({active: 1, autoHeight: false});
 //]]></script>
 {[ endSection() ]}

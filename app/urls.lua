@@ -3,6 +3,7 @@ local auth = require "luv.contrib.auth"
 local fields = require "luv.fields"
 local models = require "luv.db.models"
 local app = {models=require "app.models";forms=require "app.forms"}
+local ws = require "luv.webservers"
 
 luv:assign{
 	tr=tr;capitalize=string.capitalize;isEmpty=table.isEmpty;pairs=pairs;ipairs=ipairs;version=version;
@@ -39,6 +40,11 @@ return {
 		luv:assign{loginForm=loginForm}
 		luv:display "login.html"
 	end};
+	{"^/logout/?$"; function (urlConf)
+		local user = getAuthUser(urlConf)
+		user:logout(luv:getSession())
+		luv:setResponseHeader("Location", "/"):sendHeaders()
+	end};
 	{"^/ajax/tasks.html$"; function (urlConf)
 		local user = getAuthUser(urlConf)
 		local findTasksForm = app.forms.FindTasks(luv:getPostData())
@@ -46,11 +52,53 @@ return {
 			Http403()
 		end
 		local p = models.Paginator(app.models.Task, 10):order "-dateCreated"
-		local page = tonumber(luv:getGet "page") or 1
+		local page = tonumber(luv:getPost "page") or 1
 		luv:assign{p=p;page=page;tasks=p:getPage(page)}
 		luv:display "_tasks.html"
 	end};
-	{false; function (urlConf)
+	{"/ajax/task/set"; function ()
+		local res = app.models.Task:ajaxHandler(luv:getPostData())
+		if not res then
+			ws.Http404()
+		end
+		io.write(res)
+	end};
+	{"^/task/(%d+)/?$"; function (urlConf)
+		local user = getAuthUser(urlConf)
+		local task = app.models.Task:find(urlConf:getCapture(1))
+		if not task then
+			Http404()
+		end
+		local f = app.forms.EditTask(luv:getPostData())
+		if f:isSubmitted() then
+			if f:isValid() then
+				f:initModel(task)
+				task:update()
+			end
+		else
+			f:initForm(task)
+		end
+		luv:assign{user=user;task=task;editTaskForm=f}
+		luv:display "task.html"
+	end};
+	{"^/registration/?$"; function (urlConf)
+		local f = app.forms.Registration(luv:getPostData())
+		if f:isSubmitted() then
+			if f:isValid() then
+				local user = auth.models.User()
+				f:initModel(user)
+				if not user:insert() then
+					f:addErrors(user:getErrors())
+				else
+					f:addMsg 'Регистрация прошла успешно. Теперь Вы можете <a href="/">авторизоваться</a>.'
+					f:setValues{}
+				end
+			end
+		end
+		luv:assign{registrationForm=f}
+		luv:display "registration.html"
+	end};
+	{"^/?$"; function (urlConf)
 		local user = getAuthUser(urlConf)
 		local createTaskForm = app.forms.CreateTask(luv:getPostData())
 		if createTaskForm:isSubmitted() then

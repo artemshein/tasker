@@ -1,8 +1,0 @@
-{% if not isEmpty(errors) then %}
-	<div id="errors">
-	<h4>Ошибка!</h4>
-	{% for _, error in ipairs(errors) do %}
-		{{ error }}<br />
-	{% end %}
-	</div>
-{% end %}

@@ -1,0 +1,18 @@
+{[ extends "base.html" ]}
+
+{[ section "content" ]}
+<a href="/">&larr; На главную</a>
+<div id="accordion">
+<h1><a href="#">Регистрация</a></h1>
+<div>
+	{% if registrationForm:isSubmitted() and not registrationForm:isValid() then %}
+		{{ include("_msgs-and-errors.html", {form=registrationForm}) }}
+	{% end %}
+	{{ safe(registrationForm) }}
+</div>
+</div>
+<script type="text/javascript" language="JavaScript">//<![CDATA[
+	$("#accordion").accordion({active: 0, autoHeight: false});
+	$("textarea.resizable").resizable();
+//]]></script>
+{[ endSection() ]}

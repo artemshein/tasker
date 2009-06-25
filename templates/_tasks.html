@@ -1,9 +1,9 @@
 {% if 0 == tasks:count() then %}
 	Нет задач удовлетворяющих запросу.
 {% else %}
-	{% local pageNav = include "_pagenav.html" %}
+	{% local pageNav = include("_pagenav.html", {func="showPage"}) %}
 	{{ pageNav }}
-	<table><thead><tr><td>Название</td><td>Статус</td><td>Исполнитель</td><td>Срок</td><td>Автор</td></tr></thead><tbody>
+	<table><thead><tr><td>!</td><td>Название</td><td>Статус</td><td>Исполнитель</td><td>Срок</td><td>Автор</td></tr></thead><tbody>
 	{% for _, task in tasks() do %}
 	<tr
 		{% if task:isDone() then %}
@@ -14,10 +14,11 @@
 			class="new"
 		{% end %}
 	>
-		<td>{{ safe(task:getField "title":asAjax("/ajax/task/"..task.id.."/title/set")) }}</td>
-		<td>{{ safe(task:getField "status":asAjax("/ajax/task/"..task.id.."/status/set")) }}</td>
-		<td>{{ safe(task:getField "assignedTo":asAjax("/ajax/task/"..task.id.."/assignedTo/set")) }}</td>
-		<td>{{ safe(task:getField "dateToBeDone":asAjax("/ajax/task/"..task.id.."/dateToBeDone/set")) }} {{ safe(task:getField "timeToBeDone":asAjax("/ajax/task/"..task.id.."/timeToBeDone/set")) }}</td>
+		<td>{{ safe(task:getField "important":asAjax()) }}</td>
+		<td style="white-space:nowrap"><a href="/task/{{ task.pk }}"><img src="/images/help_16.png" width="16" height="16" alt="" style="vertical-align:middle" /></a>{{ safe(task:getField "title":asAjax()) }}</td>
+		<td>{{ safe(task:getField "status":asAjax()) }}</td>
+		<td>{{ safe(task:getField "assignedTo":asAjax()) }}</td>
+		<td style="white-space:nowrap">{{ safe(task:getField "timeToBeDone":asAjax()) }}{{ safe(task:getField "dateToBeDone":asAjax()) }}</td>
 		<td>{{ task.createdBy }}</td>
 	</tr>
 	{% end %}
