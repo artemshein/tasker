@@ -7,8 +7,8 @@ h1 {color:#FFF;font-size:12px;padding:5px 0 0 20px;font-weight:bold;font-family:
 th{background:none}
 ul{list-style-type:square}
 
-label {color:#444}
-input[type="text"], input[type="password"], textarea, select {border:solid 1px #CCC;background-color:#FFF;padding:2px;margin:2px 0;color:#444}
+label{color:#444}
+input[type="checkbox"], input[type="text"], input[type="password"], textarea, select {border:solid 1px #CCC;background-color:#FFF;padding:2px;margin:2px 0;color:#444}
 input.tiny, input.time{width:64px}
 input.small, input.date{width:80px}
 textarea.huge{width:600px;height:300px}
@@ -26,6 +26,8 @@ input.error, select.error, textarea.error{background-color:#FDD !important;borde
 div.pages{border-width:0 1px;padding:12px 10px;font-weight:bold}
 div.pages span{padding: 4px 8px;background:#FA0;margin-left:10px;color:#FFF}
 div.pages a{margin-left:10px;text-decoration:none}
+
+#filter{margin-bottom:4px}
 
 #tasks table{border-collapse:collapse}
 #tasks table td{border:solid 1px #CCC;background-color:#FFF;padding:2px 6px}

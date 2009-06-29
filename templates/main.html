@@ -11,6 +11,7 @@
 </div>
 <h1><a href="#">Список задач</a></h1>
 <div>
+	{{ safe(filterForm) }}
 	<div id="tasks"></div>
 	<script type="text/javascript" language="JavaScript">//<![CDATA[
 		function showPage (page)

@@ -8,7 +8,7 @@
 	<tr
 		{% if task:isDone() then %}
 			class="done"
-		{% elseif task.important then %}
+		{% elseif task.important == 1 then %}
 			class="important"
 		{% elseif task:isNew() then %}
 			class="new"

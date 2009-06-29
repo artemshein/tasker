@@ -1,3 +1,4 @@
+local require = require
 local forms = require "luv.forms"
 local fields = require "luv.fields"
 local app = {models=require "app.models"}
@@ -53,4 +54,13 @@ local Registration = forms.Form:extend{
 	end;
 }
 
-return {CreateTask=CreateTask;EditTask=EditTask;FindTasks=FindTasks;Registration=Registration}
+local Filter = forms.Form:extend{
+	__tag = .....".Filter";
+	Meta = {id="filter";fields={"title";"status";"self"};widget=require "luv.forms.widgets".FlowForm()};
+	title = fields.Text{label="В названии"};
+	status = fields.Text{label="Статус";choices={{"all";"все"};{"new";"новые"};{"inProgress";"не завершенные"};{"completed";"завершенные"}};widget=require "luv.fields.widgets".Select()};
+	self = fields.Boolean{label="только то, что касается меня";defaultValue=false};
+	filter = fields.Submit{defaultValue="Отфильтровать"};
+}
+
+return {CreateTask=CreateTask;EditTask=EditTask;FindTasks=FindTasks;Registration=Registration;Filter=Filter}

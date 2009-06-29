@@ -63,9 +63,9 @@ return {
 		end
 		io.write(res)
 	end};
-	{"^/task/(%d+)/?$"; function (urlConf)
+	{"^/task/(%d+)/?$"; function (urlConf, taskId)
 		local user = getAuthUser(urlConf)
-		local task = app.models.Task:find(urlConf:getCapture(1))
+		local task = app.models.Task:find(taskId)
 		if not task then
 			Http404()
 		end
@@ -110,7 +110,7 @@ return {
 				createTaskForm:setValues{}
 			end
 		end
-		luv:assign{user=user;createTaskForm=createTaskForm}
+		luv:assign{user=user;createTaskForm=createTaskForm;filterForm=app.forms.Filter()}
 		luv:display "main.html"
 	end};
 }
