@@ -1,0 +1,25 @@
+{% if 0 == p:getTotal() then %}
+	Нет записей.
+{% else %}
+	{% local pageNav = include("_pagenav.html", {func="showPage"}) %}
+	{{ pageNav }}
+	<table><thead><tr><td>Действие</td><td>Пользователь</td><td>Дата и время</td></tr></thead><tbody>
+	{% for _, log in logs() do %}
+		<td>
+		{% if "create" == log.action then %}
+			<img src="/images/page_add_16.png" width="16" height="16" alt="">
+		{% elseif "edit" == log.action then %}
+			<img src="/images/page_edit_16.png" width="16" height="16" alt="">
+		{% else %}
+			<img src="/images/page_remove_16.png" width="16" height="16" alt="">
+		{% end %}
+		{{ safe(log.text) }}
+		</td>
+		<td>{{ log.user }}</td>
+		<td>{{ date("%H:%M:%S %d.%m.%Y", log.dateTime) }}</td>
+	</tr>
+	{% end %}
+	</tbody></table>
+	{{ pageNav }}
+{% end %}
+{{ safe(debugger) }}

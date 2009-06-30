@@ -24,8 +24,8 @@ version = utils.Version(0, 2, 0, "dev")
 
 try(function ()
 
-	local cacher = {backend = require "luv.cache.backend"}
-	local TagEmuWrapper, Memcached = cacher.backend.TagEmuWrapper, cacher.backend.Memcached
+	local cache = {backend = require "luv.cache.backend"}
+	local TagEmuWrapper, Memcached = cache.backend.TagEmuWrapper, cache.backend.Memcached
 	-- Create Luv Core object with
 	luv = luv.init{
 		tmpDir = fs.Dir "/var/tmp";

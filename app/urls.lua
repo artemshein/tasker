@@ -47,6 +47,17 @@ return {
 		user:logout(luv:getSession())
 		luv:setResponseHeader("Location", "/"):sendHeaders()
 	end};
+	{"^/ajax/logs.html$"; function (urlConf)
+		local user = getAuthUser(urlConf)
+		local findLogsForm = app.forms.FindLogs(luv:getPostData())
+		if not findLogsForm:isSubmitted() or not findLogsForm:isValid() then
+			Http403()
+		end
+		local p = models.Paginator(app.models.Log, 50):order "-dateTime"
+		local page = tonumber(luv:getPost "page") or 1
+		luv:assign{p=p;page=page;logs=p:getPage(page)}
+		luv:display "_logs.html"
+	end};
 	{"^/ajax/tasks.html$"; function (urlConf)
 		local user = getAuthUser(urlConf)
 		local findTasksForm = app.forms.FindTasks(luv:getPostData())
@@ -78,10 +89,13 @@ return {
 		luv:display "_tasks.html"
 	end};
 	{"/ajax/task/set"; function ()
+		local user = getAuthUser(urlConf)
 		local res = app.models.Task:ajaxHandler(luv:getPostData())
 		if not res then
 			ws.Http404()
 		end
+		local post = luv:getPostData()
+		app.models.Log:logTaskEdit(app.models.Task:find(post.id), user)
 		io.write(res)
 	end};
 	{"^/task/(%d+)/?$"; function (urlConf, taskId)
@@ -95,7 +109,12 @@ return {
 			if f:isValid() then
 				f:initModel(task)
 				task:update()
+				app.models.Log:logTaskEdit(task, user)
+				io.write(json.serialize{result="ok"})
+			else
+				io.write(json.serialize{result="error";errors=f:getErrors()})
 			end
+			return
 		else
 			f:initForm(task)
 		end
@@ -128,17 +147,18 @@ return {
 				createTaskForm:initModel(task)
 				task.createdBy = user
 				task:insert()
-				createTaskForm:setValues{}
+				app.models.Log:logTaskCreate(task, user)
+				io.write(json.serialize{result="ok"})
+			else
+				io.write(json.serialize{result="error";errors=createTaskForm:getErrors()})
 			end
+			return
 		end
 		local filterForm = app.forms.Filter(luv:getPostData())
 		if filterForm:isSubmitted() then
 			if filterForm:isValid() then
 				filterForm:initModel(luv:getSession())
 				luv:getSession():save()
-				io.write(json.serialize{result="ok"})
-			else
-				io.write(json.serialize{result="error";errors=filterForm:getErrors()})
 			end
 			return
 		else

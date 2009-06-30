@@ -22,7 +22,7 @@ local Task = models.Model:extend{
 	assignedTo = references.ManyToOne{references=auth.models.User;label="Исполнитель";choices=auth.models.User:all()}:setAjaxWidget(widgets.Select());
 	dateToBeDone = fields.Date{label="Срок (дата)";regional="ru"};
 	timeToBeDone = fields.Time{label="Срок (время)"};
-	important = fields.Boolean{label="Приоритетная задача";defaultValue=false};
+	important = fields.Boolean{label="приоритетная задача";defaultValue=false};
 	status = fields.Text{label="Текущее состояние";defaultValue="новая"}:addClass "tiny";
 	isNew = function (self)
 		if not self.status or table.ifind(self.newStatuses, string.utf8lower(self.status)) then
@@ -39,4 +39,22 @@ local Task = models.Model:extend{
 	__tostring = function (self) return tostring(self.title) end;
 }
 
-return {Task=Task}
+local Log = models.Model:extend{
+	__tag = .....".Log";
+	Meta = {labels={"log";"logs"}};
+	user = references.ManyToOne{references=auth.models.User;required=true};
+	action = fields.Text{required=true};
+	text = fields.Text{required=true};
+	dateTime = fields.Datetime{autoNow=true};
+	logTaskCreate = function (self, task, user)
+		self:create{user=user;action="create";text="<a href="..string.format("%q", "/task/"..task.pk)..">"..tostring(task).."</a>"}
+	end;
+	logTaskEdit = function (self, task, user, field, value)
+		self:create{user=user;action="edit";text="<a href="..string.format("%q", "/task/"..task.pk)..">"..tostring(task).."</a>"}
+	end;
+	logTaskDelete = function (self, task, user)
+		self:create{user=user;action="delete";text=tostring(task)}
+	end;
+}
+
+return {Task=Task;Log=Log}

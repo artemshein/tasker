@@ -8,7 +8,7 @@ module(...)
 
 local CreateTask = forms.ModelForm:extend{
 	__tag = .....".CreateTask";
-	Meta = {model=app.models.Task;fields={"title";"assignedTo";"dateToBeDone";"timeToBeDone";"important";"description"}};
+	Meta = {model=app.models.Task;id="createTask";ajax='{success: onTaskCreate, dataType: "json"}';fields={"title";"assignedTo";"dateToBeDone";"timeToBeDone";"important";"description"}};
 	create = fields.Submit{defaultValue="Создать"};
 	init = function (self, ...)
 		forms.ModelForm.init(self, ...)
@@ -27,6 +27,11 @@ local EditTask = forms.ModelForm:extend{
 
 local FindTasks = forms.Form:extend{
 	__tag = .....".FindTasks";
+	find = fields.Submit{defaultValue="Find"};
+}
+
+local FindLogs = forms.Form:extend{
+	__tag = .....".FindLogs";
 	find = fields.Submit{defaultValue="Find"};
 }
 
@@ -72,4 +77,4 @@ local Filter = forms.Form:extend{
 	end;
 }
 
-return {CreateTask=CreateTask;EditTask=EditTask;FindTasks=FindTasks;Registration=Registration;Filter=Filter}
+return {CreateTask=CreateTask;EditTask=EditTask;FindTasks=FindTasks;FindLogs=FindLogs;Registration=Registration;Filter=Filter}

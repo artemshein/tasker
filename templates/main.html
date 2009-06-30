@@ -2,33 +2,61 @@
 
 {[ section "content" ]}
 <script type="text/javascript" language="JavaScript">//<![CDATA[
-	function onFilter (data, textStatus)
+	function onFilter (data)
 	{
-		showPage($.cookie("page") || 1);
+		showTasksPage();
+	}
+	function onTaskCreate (data)
+	{
+		if ("ok" == data.result)
+		{
+			showTasksPage();
+			alert("Задача успешно создана.");
+			$("#createTask").clearForm();
+			$("#accordion").accordion("activate", 1);
+		}
+		else
+		{
+			alert("Ошибка при создании задачи.");
+		}
 	}
 //]]></script>
 <div id="accordion">
-<h1><a href="#">Новая задача</a></h1>
-<div>
-	{% if createTaskForm:isSubmitted() and not createTaskForm:isValid() then %}
-		{{ include("_msgs-and-errors.html", {form=createTaskForm}) }}
-	{% end %}
-	{{ safe(createTaskForm) }}
-</div>
-<h1><a href="#">Список задач</a></h1>
-<div>
-	{{ safe(filterForm) }}
-	<div id="tasks"></div>
-	<script type="text/javascript" language="JavaScript">//<![CDATA[
-		function showPage (page)
-		{
-			$.cookie("page", page, 60);
-			$.post("/ajax/tasks.html", {find: "Find", page: page}, function (data)	{ $("#tasks").html(data); }, "html");
-		}
-		$("textarea.resizable").resizable();
-		showPage($.cookie("page") || 1);
-	//]]></script>
-</div>
+	<h1><a href="#">Новая задача</a></h1>
+	<div>
+		{% if createTaskForm:isSubmitted() and not createTaskForm:isValid() then %}
+			{{ include("_msgs-and-errors.html", {form=createTaskForm}) }}
+		{% end %}
+		{{ safe(createTaskForm) }}
+	</div>
+	<h1><a href="#">Список задач</a></h1>
+	<div>
+		{{ safe(filterForm) }}
+		<div id="tasks"></div>
+		<script type="text/javascript" language="JavaScript">//<![CDATA[
+			function showTasksPage (page)
+			{
+				page = page || $.cookie("tasksPage") || 1;
+				$.cookie("tasksPage", page, 60);
+				$.post("/ajax/tasks.html", {find: "Find", page: page}, function (data)	{ $("#tasks").html(data); }, "html");
+			}
+			$("textarea.resizable").resizable();
+			showTasksPage($.cookie("tasksPage") || 1);
+		//]]></script>
+	</div>
+	<h1><a href="#">История изменений</a></h1>
+	<div>
+		<div id="logs"></div>
+		<script type="text/javascript" language="JavaScript">//<![CDATA[
+			function showLogsPage (page)
+			{
+				page = page || $.cookie("logsPage") || 1;
+				$.cookie("logsPage", page, 60);
+				$.post("/ajax/logs.html", {find: "Find", page: page}, function (data)	{ $("#logs").html(data); }, "html");
+			}
+			showLogsPage();
+		//]]></script>
+	</div>
 </div>
 <script type="text/javascript" language="JavaScript">//<![CDATA[
 	$("#accordion").accordion({active: 1, autoHeight: false});
