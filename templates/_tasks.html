@@ -1,7 +1,7 @@
 {% if 0 == p:getTotal() then %}
 	Нет задач удовлетворяющих запросу.
 {% else %}
-	{% local pageNav = include("_pagenav.html", {func="showPage"}) %}
+	{% local pageNav = include("_pagenav.html", {func="showTasksPage"}) %}
 	{{ pageNav }}
 	<table><thead><tr><td>!</td><td>Название</td><td>Статус</td><td>Исполнитель</td><td>Срок</td><td>Автор</td></tr></thead><tbody>
 	{% for _, task in tasks() do %}
