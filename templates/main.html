@@ -1,6 +1,12 @@
 {[ extends "base.html" ]}
 
 {[ section "content" ]}
+<script type="text/javascript" language="JavaScript">//<![CDATA[
+	function onFilter (data, textStatus)
+	{
+		showPage($.cookie("page") || 1);
+	}
+//]]></script>
 <div id="accordion">
 <h1><a href="#">Новая задача</a></h1>
 <div>
@@ -19,8 +25,8 @@
 			$.cookie("page", page, 60);
 			$.post("/ajax/tasks.html", {find: "Find", page: page}, function (data)	{ $("#tasks").html(data); }, "html");
 		}
-		showPage($.cookie("page") || 1);
 		$("textarea.resizable").resizable();
+		showPage($.cookie("page") || 1);
 	//]]></script>
 </div>
 </div>

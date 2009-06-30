@@ -13,6 +13,8 @@ local Task = models.Model:extend{
 	__tag = .....".Task";
 	Meta = {labels={"task";"tasks"}};
 	_ajaxUrl = "/ajax/task/set";
+	newStatuses = {"";"новое";"новая";"новый"};
+	doneStatuses = {"сделано";"готово";"завершено";"закончено";"выполнено";"выполнена"};
 	title = fields.Text{required=true;label="Название"};
 	description = fields.Text{maxLength=false;label="Описание"}:addClasses{"huge";"resizable"};
 	dateCreated = fields.Datetime{autoNow=true};
@@ -23,15 +25,13 @@ local Task = models.Model:extend{
 	important = fields.Boolean{label="Приоритетная задача";defaultValue=false};
 	status = fields.Text{label="Текущее состояние";defaultValue="новая"}:addClass "tiny";
 	isNew = function (self)
-		local newStatuses = {"";"новое";"новая";"новый"}
-		if not self.status or table.ifind(newStatuses, string.utf8lower(self.status)) then
+		if not self.status or table.ifind(self.newStatuses, string.utf8lower(self.status)) then
 			return true
 		end
 		return false
 	end;
 	isDone = function (self)
-		local doneStatuses = {"сделано";"готово";"завершено";"закончено";"выполнено";"выполнена"}
-		if self.status and table.ifind(doneStatuses, string.utf8lower(self.status)) then
+		if self.status and table.ifind(self.doneStatuses, string.utf8lower(self.status)) then
 			return true
 		end
 		return false

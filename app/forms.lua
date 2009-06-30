@@ -1,4 +1,4 @@
-local require = require
+local require, io = require, io
 local forms = require "luv.forms"
 local fields = require "luv.fields"
 local app = {models=require "app.models"}
@@ -56,11 +56,20 @@ local Registration = forms.Form:extend{
 
 local Filter = forms.Form:extend{
 	__tag = .....".Filter";
-	Meta = {id="filter";fields={"title";"status";"self"};widget=require "luv.forms.widgets".FlowForm()};
+	Meta = {id="filter";ajax='{success: onFilter, dataType: "json"}';fields={"title";"status";"self"};widget=require "luv.forms.widgets".FlowForm()};
 	title = fields.Text{label="В названии"};
-	status = fields.Text{label="Статус";choices={{"all";"все"};{"new";"новые"};{"inProgress";"не завершенные"};{"completed";"завершенные"}};widget=require "luv.fields.widgets".Select()};
+	status = fields.Text{label="Статус";choices={{"new";"новые"};{"inProgress";"в процессе"};{"notCompleted";"не завершенные"};{"completed";"завершенные"}};widget=require "luv.fields.widgets".Select()};
 	self = fields.Boolean{label="только то, что касается меня";defaultValue=false};
 	filter = fields.Submit{defaultValue="Отфильтровать"};
+	initModel = function (self, session)
+		session.tasksFilter = {title=self.title;status=self.status;self=self.self}
+	end;
+	initForm = function (self, session)
+		local tasksFilter = session.tasksFilter or {}
+		self.title = tasksFilter.title
+		self.status = tasksFilter.status
+		self.self = tasksFilter.self
+	end;
 }
 
 return {CreateTask=CreateTask;EditTask=EditTask;FindTasks=FindTasks;Registration=Registration;Filter=Filter}

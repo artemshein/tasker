@@ -2,8 +2,10 @@ local forms = require "luv.forms"
 local auth = require "luv.contrib.auth"
 local fields = require "luv.fields"
 local models = require "luv.db.models"
+local Q = models.Q
 local app = {models=require "app.models";forms=require "app.forms"}
 local ws = require "luv.webservers"
+local json = require "luv.utils.json"
 
 luv:assign{
 	tr=tr;capitalize=string.capitalize;isEmpty=table.isEmpty;pairs=pairs;ipairs=ipairs;version=version;
@@ -53,6 +55,25 @@ return {
 		end
 		local p = models.Paginator(app.models.Task, 10):order "-dateCreated"
 		local page = tonumber(luv:getPost "page") or 1
+		local tasksFilter = luv:getSession().tasksFilter or {}
+		if tasksFilter.title and "" ~= tasksFilter.title then
+			p:filter{title__contains=tasksFilter.title}
+		end
+		if tasksFilter.self then
+			p:filter(Q{assignedTo=user}-Q{createdBy=user})
+		end
+		if tasksFilter.status then
+			if "new" == tasksFilter.status then
+				p:filter{status__in=app.models.Task.newStatuses}
+			elseif "inProgress" == tasksFilter.status then
+				p:exclude{status__in=app.models.Task.newStatuses}
+				p:exclude{status__in=app.models.Task.doneStatuses}
+			elseif "notCompleted" == tasksFilter.status then
+				p:exclude{status__in=app.models.Task.doneStatuses}
+			elseif "completed" == tasksFilter.status then
+				p:filter{status__in=app.models.Task.doneStatuses}
+			end
+		end
 		luv:assign{p=p;page=page;tasks=p:getPage(page)}
 		luv:display "_tasks.html"
 	end};
@@ -110,7 +131,20 @@ return {
 				createTaskForm:setValues{}
 			end
 		end
-		luv:assign{user=user;createTaskForm=createTaskForm;filterForm=app.forms.Filter()}
+		local filterForm = app.forms.Filter(luv:getPostData())
+		if filterForm:isSubmitted() then
+			if filterForm:isValid() then
+				filterForm:initModel(luv:getSession())
+				luv:getSession():save()
+				io.write(json.serialize{result="ok"})
+			else
+				io.write(json.serialize{result="error";errors=filterForm:getErrors()})
+			end
+			return
+		else
+			filterForm:initForm(luv:getSession())
+		end
+		luv:assign{user=user;createTaskForm=createTaskForm;filterForm=filterForm}
 		luv:display "main.html"
 	end};
 }

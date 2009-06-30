@@ -1,4 +1,4 @@
-{% if 0 == tasks:count() then %}
+{% if 0 == p:getTotal() then %}
 	Нет задач удовлетворяющих запросу.
 {% else %}
 	{% local pageNav = include("_pagenav.html", {func="showPage"}) %}
@@ -25,3 +25,4 @@
 	</tbody></table>
 	{{ pageNav }}
 {% end %}
+{{ safe(debugger) }}
