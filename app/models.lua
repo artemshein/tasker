@@ -1,3 +1,4 @@
+local tr = tr
 local models = require "luv.db.models"
 local fields = require "luv.fields"
 local references = require "luv.fields.references"
@@ -12,18 +13,18 @@ module(...)
 local Task = models.Model:extend{
 	__tag = .....".Task";
 	Meta = {labels={"task";"tasks"}};
-	_ajaxUrl = "/ajax/task/set";
-	newStatuses = {"";"новое";"новая";"новый"};
-	doneStatuses = {"сделано";"готово";"завершено";"закончено";"выполнено";"выполнена"};
-	title = fields.Text{required=true;label="Название"};
-	description = fields.Text{maxLength=false;label="Описание"}:addClasses{"huge";"resizable"};
+	_ajaxUrl = "/ajax/task/field-set.json";
+	newStatuses = {"";"new";"новое";"новая";"новый"};
+	doneStatuses = {"done";"finished";"сделано";"готово";"завершено";"закончено";"выполнено";"выполнена"};
+	title = fields.Text{required=true;label=string.capitalize(tr "title")};
+	description = fields.Text{maxLength=false;label=string.capitalize(tr "description")}:addClasses{"huge";"resizable"};
 	dateCreated = fields.Datetime{autoNow=true};
 	createdBy = references.ManyToOne{references=auth.models.User;required=true;choices=auth.models.User:all()}:setAjaxWidget(widgets.Select());
-	assignedTo = references.ManyToOne{references=auth.models.User;label="Исполнитель";choices=auth.models.User:all()}:setAjaxWidget(widgets.Select());
-	dateToBeDone = fields.Date{label="Срок (дата)";regional="ru"};
-	timeToBeDone = fields.Time{label="Срок (время)"};
-	important = fields.Boolean{label="приоритетная задача";defaultValue=false};
-	status = fields.Text{label="Текущее состояние";defaultValue="новая"}:addClass "tiny";
+	assignedTo = references.ManyToOne{references=auth.models.User;label=string.capitalize(tr "executor");choices=auth.models.User:all()}:setAjaxWidget(widgets.Select());
+	dateToBeDone = fields.Date{label=string.capitalize(tr "term (date)")};
+	timeToBeDone = fields.Time{label=string.capitalize(tr "term (time)")};
+	important = fields.Boolean{label=tr "priority task";defaultValue=false};
+	status = fields.Text{label=string.capitalize(tr "current state");defaultValue=tr "new"}:addClass "tiny";
 	isNew = function (self)
 		if not self.status or table.ifind(self.newStatuses, string.utf8lower(self.status)) then
 			return true

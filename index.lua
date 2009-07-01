@@ -5,11 +5,12 @@ for _, path in ipairs{"/usr/lib/lua/5.1/";"/usr/share/lua/5.1/";"/usr/local/lib/
 	package.path = (package.path or "?.lua")..";"..path.."?.lua;"..path.."?/init.lua"
 end
 
-tr = function (str) return str end
-
 luv = require "luv"
 local exceptions = require "luv.exceptions"
 local Exception, try = exceptions.Exception, exceptions.try
+
+local i18n = require "luv.i18n".I18n("app/i18n", "ru_RU")
+tr = function (str) return i18n:tr(str) or str end
 
 local auth, utils, html, fs
 
@@ -20,7 +21,7 @@ end):catch(function (e)
 	io.write ("Content-type: text/html\n\n<pre>"..tostring(e))
 end)
 
-version = utils.Version(0, 2, 0, "dev")
+version = utils.Version(0, 3, 0, "alpha")
 
 try(function ()
 
@@ -28,11 +29,11 @@ try(function ()
 	local TagEmuWrapper, Memcached = cache.backend.TagEmuWrapper, cache.backend.Memcached
 	-- Create Luv Core object with
 	luv = luv.init{
-		tmpDir = fs.Dir "/var/tmp";
-		sessionDir = fs.Dir "/var/www/sessions";
+		tmpDir = "/var/tmp";
+		sessionDir = "/var/www/sessions";
 		templatesDirs = {
-			fs.Dir "/var/www/tasker/templates",
-			fs.Dir "/usr/lib/lua/5.1/luv/contrib/admin/templates"
+			"/var/www/tasker/templates";
+			"/usr/lib/lua/5.1/luv/contrib/admin/templates";
 		};
 		dsn = "mysql://tasker:sd429dbkewls@localhost/tasker";
 		debugger = require "luv.dev.debuggers".Fire();

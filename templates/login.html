@@ -2,6 +2,9 @@
 
 {[ section "content" ]}
 
+{% if loginForm:isSubmitted() and not loginForm:isValid() then %}
+	{{ include("_msgs-and-errors.html", {form=loginForm}) }}
+{% end %}
 {{ safe(loginForm) }}
 
 {[ endSection() ]}

@@ -4,7 +4,10 @@
 <script type="text/javascript" language="JavaScript">//<![CDATA[
 	function onFilter (data)
 	{
-		showTasksPage();
+		if ("ok" == data.result)
+			showTasksPage();
+		else
+			alert("Ошибочка вышла.");
 	}
 	function onTaskCreate (data)
 	{
@@ -20,6 +23,17 @@
 		{
 			alert("Ошибка при создании задачи.");
 		}
+	}
+	function deleteTask (id)
+	{
+		if (!confirm("Подтверждаете УДАЛЕНИЕ задачи?"))
+			return false;
+		$.post("/ajax/task/delete.json", {id: id, "delete": "Delete"}, function (data) {
+			if ("ok" == data.result)
+				showTasksPage();
+			else
+				alert("Ошибочка вышла.");
+		}, "json");
 	}
 //]]></script>
 <div id="accordion">
@@ -39,7 +53,7 @@
 			{
 				page = page || $.cookie("tasksPage") || 1;
 				$.cookie("tasksPage", page, 60);
-				$.post("/ajax/tasks.html", {find: "Find", page: page}, function (data)	{ $("#tasks").html(data); }, "html");
+				$.post("/ajax/task/list", {find: "Find", page: page}, function (data)	{ $("#tasks").html(data); }, "html");
 			}
 			$("textarea.resizable").resizable();
 			showTasksPage($.cookie("tasksPage") || 1);
@@ -53,7 +67,7 @@
 			{
 				page = page || $.cookie("logsPage") || 1;
 				$.cookie("logsPage", page, 60);
-				$.post("/ajax/logs.html", {find: "Find", page: page}, function (data)	{ $("#logs").html(data); }, "html");
+				$.post("/ajax/log/list", {find: "Find", page: page}, function (data)	{ $("#logs").html(data); }, "html");
 			}
 			showLogsPage();
 		//]]></script>

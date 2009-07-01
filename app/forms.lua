@@ -1,4 +1,5 @@
-local require, io = require, io
+local require, io, tr = require, io, tr
+local string = require "luv.string"
 local forms = require "luv.forms"
 local fields = require "luv.fields"
 local app = {models=require "app.models"}
@@ -9,7 +10,7 @@ module(...)
 local CreateTask = forms.ModelForm:extend{
 	__tag = .....".CreateTask";
 	Meta = {model=app.models.Task;id="createTask";ajax='{success: onTaskCreate, dataType: "json"}';fields={"title";"assignedTo";"dateToBeDone";"timeToBeDone";"important";"description"}};
-	create = fields.Submit{defaultValue="Создать"};
+	create = fields.Submit{defaultValue=string.capitalize(tr "create")};
 	init = function (self, ...)
 		forms.ModelForm.init(self, ...)
 		local dateId = self:getField "dateToBeDone":getId()
@@ -22,33 +23,39 @@ local CreateTask = forms.ModelForm:extend{
 local EditTask = forms.ModelForm:extend{
 	__tag = .....".EditTask";
 	Meta = {model=app.models.Task;fields={"title";"assignedTo";"dateToBeDone";"timeToBeDone";"important";"description"}};
-	save = fields.Submit{defaultValue="Сохранить"};
+	save = fields.Submit{defaultValue=string.capitalize(tr "save")};
+}
+
+local DeleteTask = forms.Form:extend{
+	__tag = .....".DeleteTask";
+	id = app.models.Task:getField "id":clone();
+	delete = fields.Submit{defaultValue=string.capitalize(tr "delete")};
 }
 
 local FindTasks = forms.Form:extend{
 	__tag = .....".FindTasks";
-	find = fields.Submit{defaultValue="Find"};
+	find = fields.Submit{defaultValue=string.capitalize(tr "find")};
 }
 
 local FindLogs = forms.Form:extend{
 	__tag = .....".FindLogs";
-	find = fields.Submit{defaultValue="Find"};
+	find = fields.Submit{defaultValue=string.capitalize(tr "find")};
 }
 
 local Registration = forms.Form:extend{
 	__tag = .....".Registration";
 	Meta = {fields={"login";"password";"repeatPassword";"name";"email"}};
-	login = auth.models.User:getField "login":clone():setLabel "Логин";
-	password = fields.Password{required=true;label="Пароль"};
-	repeatPassword = fields.Password{required=true;label="Повторите пароль"};
-	name = auth.models.User:getField "name":clone():setRequired(true):setLabel "ФИО";
-	email = auth.models.User:getField "email":clone():setRequired(true):setLabel "Эл. почта";
-	register = fields.Submit{defaultValue="Зарегистрироваться"};
+	login = auth.models.User:getField "login":clone();
+	password = fields.Password{required=true;label=string.capitalize(tr "password")};
+	repeatPassword = fields.Password{required=true;label=string.capitalize(tr "repeat password")};
+	name = auth.models.User:getField "name":clone():setRequired(true):setLabel(string.capitalize(tr "full name"));
+	email = auth.models.User:getField "email":clone():setRequired(true);
+	register = fields.Submit{defaultValue=string.capitalize(tr "register")};
 	isValid = function (self)
 		local res = forms.Form.isValid(self)
 		if self.password ~= self.repeatPassword then
 			res = false
-			self:addError "Passwords don't match."
+			self:addError(tr "Passwords don't match.")
 		end
 		return res
 	end;
@@ -61,11 +68,11 @@ local Registration = forms.Form:extend{
 
 local Filter = forms.Form:extend{
 	__tag = .....".Filter";
-	Meta = {id="filter";ajax='{success: onFilter, dataType: "json"}';fields={"title";"status";"self"};widget=require "luv.forms.widgets".FlowForm()};
-	title = fields.Text{label="В названии"};
-	status = fields.Text{label="Статус";choices={{"new";"новые"};{"inProgress";"в процессе"};{"notCompleted";"не завершенные"};{"completed";"завершенные"}};widget=require "luv.fields.widgets".Select()};
-	self = fields.Boolean{label="только то, что касается меня";defaultValue=false};
-	filter = fields.Submit{defaultValue="Отфильтровать"};
+	Meta = {id="filter";action="/ajax/filter.json";ajax='{success: onFilter, dataType: "json"}';fields={"title";"status";"self"};widget=require "luv.forms.widgets".FlowForm()};
+	title = fields.Text{label=string.capitalize(tr "in title")};
+	status = fields.Text{label=string.capitalize(tr "status");choices={{"new";tr "new"};{"inProgress";tr "in progress"};{"notCompleted";tr "not completed"};{"completed";tr "finished"}};widget=require "luv.fields.widgets".Select()};
+	self = fields.Boolean{label=tr "only that for me";defaultValue=false};
+	filter = fields.Submit{defaultValue=string.capitalize(tr "filter")};
 	initModel = function (self, session)
 		session.tasksFilter = {title=self.title;status=self.status;self=self.self}
 	end;
@@ -77,4 +84,4 @@ local Filter = forms.Form:extend{
 	end;
 }
 
-return {CreateTask=CreateTask;EditTask=EditTask;FindTasks=FindTasks;FindLogs=FindLogs;Registration=Registration;Filter=Filter}
+return {CreateTask=CreateTask;EditTask=EditTask;DeleteTask=DeleteTask;FindTasks=FindTasks;FindLogs=FindLogs;Registration=Registration;Filter=Filter}

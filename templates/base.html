@@ -5,7 +5,7 @@
 	<meta http-equiv="content-type" content="text/html; charset=utf-8">
 	<meta name="author" content="Artyom Shein">
 
-	<title>{{ capitalize(tr(title or "")) }} - Tasker</title>
+	<title>{{ capitalize(tr(title or "")) }} - {{ capitalize(tr "tasker") }}</title>
 
 	<link rel="stylesheet" type="text/css" href="/css/blueprint/screen.css" media="screen, projection" />
 	<link rel="stylesheet" type="text/css" href="/css/blueprint/print.css" media="print" />
@@ -21,13 +21,13 @@
 <div class="container">
 
 <div id="info">
-	<div class="user-info">{% if user then %}Вы &mdash; {{ user }} [<a href="/logout">выйти &rarr;</a>]{% else %}<a href="javascript:void(0)" onclick="alert('Обращайся к администратору.')">Забыл пароль</a> | <a href="/registration">зарегистрироваться</a>{% end %}</div>
-	<h1>Tasker <small>ver.{{ version }}</small></h1>
+	<div class="user-info">{% if user then %}{{ capitalize(tr "you are") }} {{ user }} [<a href="/logout">{{ tr "logout" }} &rarr;</a>]{% else %}<a href="javascript:void(0)" onclick="alert('Обращайся к администратору.')">{{ capitalize(tr "forgot password") }}</a> | <a href="/registration">{{ capitalize(tr "register") }}</a>{% end %}</div>
+	<h1>{{ capitalize(tr "tasker") }}&trade; <small>{{ tr "version" }} {{ version }}</small></h1>
 </div>
 
 {[ section "content" ]}
 {[ endSection() ]}
-
+<a href="/help">{{ capitalize(tr "help") }}</a> | {{ capitalize(tr "administrator") }}: <a href="mailto:Artem.Shein@rsce.ru">Шеин Артём</a> | {{ capitalize(tr "copyright") }} &copy; 2009 {{ tr "RSC Energia" }}, {{ tr "department" }} 037.
 </div>
 {{ safe(debugger) }}
 </body>
