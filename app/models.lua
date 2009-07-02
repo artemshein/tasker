@@ -7,6 +7,7 @@ local auth = require "luv.contrib.auth"
 local tostring = tostring
 local string = require "luv.string"
 local table = require "luv.table"
+local capitalize = string.capitalize
 
 module(...)
 
@@ -15,16 +16,16 @@ local Task = models.Model:extend{
 	Meta = {labels={"task";"tasks"}};
 	_ajaxUrl = "/ajax/task/field-set.json";
 	newStatuses = {"";"new";"новое";"новая";"новый"};
-	doneStatuses = {"done";"finished";"сделано";"готово";"завершено";"закончено";"выполнено";"выполнена"};
-	title = fields.Text{required=true;label=string.capitalize(tr "title")};
-	description = fields.Text{maxLength=false;label=string.capitalize(tr "description")}:addClasses{"huge";"resizable"};
+	doneStatuses = {"done";"finished";"completed";"сделано";"сделан";"сделана";"готово";"готова";"готов";"завершено";"закончено";"закончена";"закончен";"выполнено";"выполнена"};
+	title = fields.Text{required=true;label=capitalize(tr "title")};
+	description = fields.Text{maxLength=false;label=capitalize(tr "description")}:addClasses{"huge";"resizable"};
 	dateCreated = fields.Datetime{autoNow=true};
 	createdBy = references.ManyToOne{references=auth.models.User;required=true;choices=auth.models.User:all()}:setAjaxWidget(widgets.Select());
-	assignedTo = references.ManyToOne{references=auth.models.User;label=string.capitalize(tr "executor");choices=auth.models.User:all()}:setAjaxWidget(widgets.Select());
-	dateToBeDone = fields.Date{label=string.capitalize(tr "term (date)")};
-	timeToBeDone = fields.Time{label=string.capitalize(tr "term (time)")};
+	assignedTo = references.ManyToOne{references=auth.models.User;label=capitalize(tr "executor");choices=auth.models.User:all()}:setAjaxWidget(widgets.Select());
+	dateToBeDone = fields.Date{label=capitalize(tr "term (date)")};
+	timeToBeDone = fields.Time{label=capitalize(tr "term (time)")};
 	important = fields.Boolean{label=tr "priority task";defaultValue=false};
-	status = fields.Text{label=string.capitalize(tr "current state");defaultValue=tr "new"}:addClass "tiny";
+	status = fields.Text{label=capitalize(tr "current state");defaultValue=tr "new"}:addClass "tiny";
 	isNew = function (self)
 		if not self.status or table.ifind(self.newStatuses, string.utf8lower(self.status)) then
 			return true
@@ -58,4 +59,11 @@ local Log = models.Model:extend{
 	end;
 }
 
-return {Task=Task;Log=Log}
+local Options = models.Model:extend{
+	__tag = .....".Options";
+	Meta = {labels={"options";"options"}};
+	user = references.OneToOne{references=auth.models.User;required=true};
+	tasksPerPage = fields.Int{label=capitalize(tr "tasks per page");defaultValue=10;required=true;choices={{10;10};{20;20};{30;30};{40;40};{50;50}}};
+}
+
+return {Task=Task;Log=Log;Options=Options}

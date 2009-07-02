@@ -2,12 +2,23 @@
 
 {[ section "content" ]}
 <script type="text/javascript" language="JavaScript">//<![CDATA[
-	function onFilter (data)
+	function showErrors (errors)
+	{
+		$.each(errors, function (i, error) { alert(error); });
+	}
+	function onTasksFilter (data)
 	{
 		if ("ok" == data.result)
 			showTasksPage();
 		else
-			alert("Ошибочка вышла.");
+			showErrors(data.errors);
+	}
+	function onLogsFilter (data)
+	{
+		if ("ok" == data.result)
+			showLogsPage();
+		else
+			showErrors(data.errors);
 	}
 	function onTaskCreate (data)
 	{
@@ -20,9 +31,7 @@
 			$("#accordion").accordion("activate", 1);
 		}
 		else
-		{
-			alert("Ошибка при создании задачи.");
-		}
+			showErrors(data.errors);
 	}
 	function deleteTask (id)
 	{
@@ -32,21 +41,35 @@
 			if ("ok" == data.result)
 				showTasksPage();
 			else
-				alert("Ошибочка вышла.");
+				showErrors(data.errors);
 		}, "json");
+	}
+	function onOptionsSave (data)
+	{
+		if ("ok" == data.result)
+		{
+			showTasksPage();
+			alert("Настройки успешно сохранены.");
+			$("#optionsNewPassword").val("");
+			$("#optionsNewPassword2").val("");
+			$("#optionsPassword").val("");
+			$("#accordion").accordion("activate", 1);
+		}
+		else
+			showErrors(data.errors);
 	}
 //]]></script>
 <div id="accordion">
 	<h1><a href="#">Новая задача</a></h1>
 	<div>
-		{% if createTaskForm:isSubmitted() and not createTaskForm:isValid() then %}
+		{% if createTaskForm:isSubmitted() then %}
 			{{ include("_msgs-and-errors.html", {form=createTaskForm}) }}
 		{% end %}
 		{{ safe(createTaskForm) }}
 	</div>
 	<h1><a href="#">Список задач</a></h1>
 	<div>
-		{{ safe(filterForm) }}
+		{{ safe(tasksFilterForm) }}
 		<div id="tasks"></div>
 		<script type="text/javascript" language="JavaScript">//<![CDATA[
 			function showTasksPage (page)
@@ -61,6 +84,7 @@
 	</div>
 	<h1><a href="#">История изменений</a></h1>
 	<div>
+		{{ safe(logsFilterForm) }}
 		<div id="logs"></div>
 		<script type="text/javascript" language="JavaScript">//<![CDATA[
 			function showLogsPage (page)
@@ -71,6 +95,10 @@
 			}
 			showLogsPage();
 		//]]></script>
+	</div>
+	<h1><a href="#">Настройки пользователя</a></h1>
+	<div>
+		{{ safe(optionsForm) }}
 	</div>
 </div>
 <script type="text/javascript" language="JavaScript">//<![CDATA[

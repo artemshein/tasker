@@ -21,7 +21,7 @@ end):catch(function (e)
 	io.write ("Content-type: text/html\n\n<pre>"..tostring(e))
 end)
 
-version = utils.Version(0, 3, 0, "alpha")
+version = utils.Version(0, 4, 0, "alpha")
 
 try(function ()
 

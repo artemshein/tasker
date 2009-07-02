@@ -5,9 +5,7 @@
 <div id="accordion">
 <h1><a href="#">Регистрация</a></h1>
 <div>
-	{% if registrationForm:isSubmitted() and not registrationForm:isValid() then %}
-		{{ include("_msgs-and-errors.html", {form=registrationForm}) }}
-	{% end %}
+	{{ include("_msgs-and-errors.html", {form=registrationForm}) }}
 	{{ safe(registrationForm) }}
 </div>
 </div>

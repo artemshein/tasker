@@ -1,7 +1,7 @@
 {% if not isEmpty(form:getMsgs()) then %}
 	<div id="msgs">
 	{% for _, msg in ipairs(form:getMsgs()) do %}
-		{{ msg }}<br />
+		{{ safe(msg) }}<br />
 	{% end %}
 	</div>
 {% end %}
@@ -9,7 +9,7 @@
 	<div id="errors">
 	<h4>Ошибка!</h4>
 	{% for _, error in ipairs(form:getErrors()) do %}
-		{{ error }}<br />
+		{{ safe(error) }}<br />
 	{% end %}
 	</div>
 {% end %}
