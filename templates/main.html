@@ -62,7 +62,7 @@
 <div id="accordion">
 	<h1><a href="#">Новая задача</a></h1>
 	<div>
-		{% if createTaskForm:isSubmitted() then %}
+		{% if createTaskForm:submitted() then %}
 			{{ include("_msgs-and-errors.html", {form=createTaskForm}) }}
 		{% end %}
 		{{ safe(createTaskForm) }}

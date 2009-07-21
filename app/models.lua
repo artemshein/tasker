@@ -20,8 +20,8 @@ local Task = models.Model:extend{
 	title = fields.Text{required=true;label=capitalize(tr "title")};
 	description = fields.Text{maxLength=false;label=capitalize(tr "description")}:addClasses{"huge";"resizable"};
 	dateCreated = fields.Datetime{autoNow=true};
-	createdBy = references.ManyToOne{references=auth.models.User;required=true;choices=auth.models.User:all()}:setAjaxWidget(widgets.Select());
-	assignedTo = references.ManyToOne{references=auth.models.User;label=capitalize(tr "executor");choices=auth.models.User:all()}:setAjaxWidget(widgets.Select());
+	createdBy = references.ManyToOne{references=auth.models.User;required=true;choices=auth.models.User:all()}:ajaxWidget(widgets.Select());
+	assignedTo = references.ManyToOne{references=auth.models.User;label=capitalize(tr "executor");choices=auth.models.User:all()}:ajaxWidget(widgets.Select());
 	dateToBeDone = fields.Date{label=capitalize(tr "term (date)")};
 	timeToBeDone = fields.Time{label=capitalize(tr "term (time)")};
 	important = fields.Boolean{label=tr "priority task";defaultValue=false};

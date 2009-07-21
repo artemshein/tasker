@@ -13,9 +13,9 @@ luv:assign{
 	date=os.date;
 }
 
-local function getAuthUser (urlConf)
-	local user = auth.models.User:getAuthUser(luv:getSession())
-	if not user or not user.isActive then luv:setResponseHeader("Location", urlConf:getBaseUri().."/login"):sendHeaders() end
+local function authUser (urlConf)
+	local user = auth.models.User:authUser(luv:session())
+	if not user or not user.isActive then luv:responseHeader("Location", urlConf:baseUri().."/login"):sendHeaders() end
 	return user
 end
 
@@ -28,47 +28,47 @@ return {
 		luv:displayString "{{ safe(debugger) }}OK"
 	end};]]
 	{"^/login/?$"; function (urlConf)
-		local loginForm = auth.forms.Login(luv:getPostData())
-		local user = auth.models.User:getAuthUser(luv:getSession(), loginForm)
+		local loginForm = auth.forms.Login(luv:postData())
+		local user = auth.models.User:authUser(luv:session(), loginForm)
 		if user and user.isActive then
-			luv:setResponseHeader("Location", "/"):sendHeaders()
+			luv:responseHeader("Location", "/"):sendHeaders()
 		end
 		luv:assign{title="authorisation";loginForm=loginForm}
 		luv:display "login.html"
 	end};
 	{"^/logout/?$"; function (urlConf)
-		local user = getAuthUser(urlConf)
-		user:logout(luv:getSession())
-		luv:setResponseHeader("Location", "/"):sendHeaders()
+		local user = authUser(urlConf)
+		user:logout(luv:session())
+		luv:responseHeader("Location", "/"):sendHeaders()
 	end};
 	{"^/ajax/log/list/?$"; function (urlConf)
-		local user = getAuthUser(urlConf)
-		local findLogsForm = app.forms.FindLogs(luv:getPostData())
-		if not findLogsForm:isSubmitted() or not findLogsForm:isValid() then
+		local user = authUser(urlConf)
+		local findLogsForm = app.forms.FindLogs(luv:postData())
+		if not findLogsForm:submitted() or not findLogsForm:valid() then
 			ws.Http403()
 		end
 		local p = models.Paginator(app.models.Log, 50):order "-dateTime"
-		local page = tonumber(luv:getPost "page") or 1
-		local logsFilter = luv:getSession().logsFilter or {}
+		local page = tonumber(luv:post "page") or 1
+		local logsFilter = luv:session().logsFilter or {}
 		if logsFilter.action and "" ~= logsFilter.action then
 			p:filter{action=logsFilter.action}
 		end
 		if logsFilter.mine then
 			p:filter{user=user}
 		end
-		luv:assign{p=p;page=page;logs=p:getPage(page)}
+		luv:assign{p=p;page=page;logs=p:page(page)}
 		luv:display "_logs.html"
 	end};
 	{"^/ajax/task/list/?$"; function (urlConf)
 		-- Отфильтрованный список задач
-		local user = getAuthUser(urlConf)
-		local findTasksForm = app.forms.FindTasks(luv:getPostData())
-		if not findTasksForm:isSubmitted() or not findTasksForm:isValid() then
+		local user = authUser(urlConf)
+		local findTasksForm = app.forms.FindTasks(luv:postData())
+		if not findTasksForm:submitted() or not findTasksForm:valid() then
 			ws.Http403()
 		end
 		local p = models.Paginator(app.models.Task, user.options and user.options.tasksPerPage or 10):order "-dateCreated"
 		local page = tonumber(luv:getPost "page") or 1
-		local tasksFilter = luv:getSession().tasksFilter or {}
+		local tasksFilter = luv:session().tasksFilter or {}
 		if tasksFilter.title and "" ~= tasksFilter.title then
 			p:filter{title__contains=tasksFilter.title}
 		end
@@ -87,24 +87,24 @@ return {
 				p:filter{status__in=app.models.Task.doneStatuses}
 			end
 		end
-		luv:assign{user=user;p=p;page=page;tasks=p:getPage(page)}
+		luv:assign{user=user;p=p;page=page;tasks=p:page(page)}
 		luv:display "_tasks.html"
 	end};
 	{"/ajax/task/field%-set%.json"; function ()
-		local user = getAuthUser(urlConf)
-		local res = app.models.Task:ajaxHandler(luv:getPostData())
+		local user = authUser(urlConf)
+		local res = app.models.Task:ajaxHandler(luv:postData())
 		if not res then
 			ws.Http404()
 		end
-		local post = luv:getPostData()
+		local post = luv:postData()
 		app.models.Log:logTaskEdit(app.models.Task:find(post.id), user)
 		io.write(res)
 	end};
 	{"/ajax/task/delete%.json"; function ()
-		local user = getAuthUser()
-		local f = app.forms.DeleteTask(luv:getPostData())
-		if f:isSubmitted() then
-			if f:isValid() then
+		local user = authUser()
+		local f = app.forms.DeleteTask(luv:postData())
+		if f:submitted() then
+			if f:valid() then
 				local task = app.models.Task:find(f.id)
 				if task and task.createdBy == user then
 					task:delete()
@@ -112,25 +112,25 @@ return {
 					io.write(json.serialize{result="ok"})
 				end
 			else
-				io.write(json.serialize{result="error";errors=f:getErrors()})
+				io.write(json.serialize{result="error";errors=f:errors()})
 			end
 		end
 	end};
 	{"^/task/(%d+)/?$"; function (urlConf, taskId)
-		local user = getAuthUser(urlConf)
+		local user = authUser(urlConf)
 		local task = app.models.Task:find(taskId)
 		if not task then
 			ws.Http404()
 		end
-		local f = app.forms.EditTask(luv:getPostData())
-		if f:isSubmitted() then
-			if f:isValid() then
+		local f = app.forms.EditTask(luv:postData())
+		if f:submitted() then
+			if f:valid() then
 				f:initModel(task)
 				task:update()
 				app.models.Log:logTaskEdit(task, user)
 				io.write(json.serialize{result="ok"})
 			else
-				io.write(json.serialize{result="error";errors=f:getErrors()})
+				io.write(json.serialize{result="error";errors=f:errors()})
 			end
 			return
 		else
@@ -140,17 +140,17 @@ return {
 		luv:display "task.html"
 	end};
 	{"^/registration/?$"; function (urlConf)
-		local f = app.forms.Registration(luv:getPostData())
-		if f:isSubmitted() then
-			if f:isValid() then
+		local f = app.forms.Registration(luv:postData())
+		if f:submitted() then
+			if f:valid() then
 				local user = auth.models.User()
 				f:initModel(user)
 				if not user:insert() then
-					f:addErrors(user:getErrors())
+					f:addErrors(user:errors())
 				else
 					app.models.Options:create{user=user}
 					f:addMsg 'Регистрация прошла успешно. Теперь Вы можете <a href="/">авторизоваться</a>.'
-					f:setValues{}
+					f:values{}
 				end
 			end
 		end
@@ -159,15 +159,15 @@ return {
 	end};
 	{"^/ajax/task/filter%-list%.json$"; function (urlConf)
 		-- Применение фильтра
-		local user = getAuthUser(urlConf)
-		local f = app.forms.TasksFilter(luv:getPostData())
-		if f:isSubmitted() then
-			if f:isValid() then
-				f:initModel(luv:getSession())
-				luv:getSession():save()
+		local user = authUser(urlConf)
+		local f = app.forms.TasksFilter(luv:postData())
+		if f:submitted() then
+			if f:valid() then
+				f:initModel(luv:session())
+				luv:session():save()
 				io.write(json.serialize{result="ok"})
 			else
-				io.write(json.serialize{result="error";errors=f:getErrors()})
+				io.write(json.serialize{result="error";errors=f:errors()})
 			end
 		else
 			ws.Http404()
@@ -175,15 +175,15 @@ return {
 	end};
 	{"^/ajax/log/filter%-list%.json$"; function (urlConf)
 		-- Применение фильтра
-		local user = getAuthUser(urlConf)
-		local f = app.forms.LogsFilter(luv:getPostData())
-		if f:isSubmitted() then
-			if f:isValid() then
-				f:initModel(luv:getSession())
-				luv:getSession():save()
+		local user = authUser(urlConf)
+		local f = app.forms.LogsFilter(luv:postData())
+		if f:submitted() then
+			if f:valid() then
+				f:initModel(luv:session())
+				luv:session():save()
 				io.write(json.serialize{result="ok"})
 			else
-				io.write(json.serialize{result="error";errors=f:getErrors()})
+				io.write(json.serialize{result="error";errors=f:errors()})
 			end
 		else
 			ws.Http404()
@@ -194,8 +194,8 @@ return {
 		luv:display "help.html"
 	end};
 	{"^/ajax/task/create%.json$"; function (urlConf)
-		local user = getAuthUser(urlConf)
-		local f = app.forms.CreateTask(luv:getPostData())
+		local user = authUser(urlConf)
+		local f = app.forms.CreateTask(luv:postData())
 		f:processAjaxForm(function (f)
 			local task = app.models.Task()
 			f:initModel(task)
@@ -205,8 +205,8 @@ return {
 		end)
 	end};
 	{"^/ajax/save%-options%.json"; function (urlConf)
-		local user = getAuthUser(urlConf)
-		local f = app.forms.Options(luv:getPostData())
+		local user = authUser(urlConf)
+		local f = app.forms.Options(luv:postData())
 		f:processAjaxForm(function (f)
 			if not user:comparePassword(f.password) then
 				f:addError(tr "Wrong password.")
@@ -222,25 +222,25 @@ return {
 			end
 			user.name = f.fullName
 			if not user:save() then
-				f:addErrors(user:getErrors())
+				f:addErrors(user:errors())
 				return false
 			end
 			local options = user.options or app.models.Options()
 			f:initModel(options)
 			if not options:save() then
-				f:addErrors(options:getErrors())
+				f:addErrors(options:errors())
 				return false
 			end
 		end)
 	end};
 	{"^/?$"; function (urlConf)
-		local user = getAuthUser(urlConf)
+		local user = authUser(urlConf)
 		local createTaskForm = app.forms.CreateTask()
 		local tasksFilterForm = app.forms.TasksFilter()
 		local logsFilterForm = app.forms.LogsFilter()
 		local optionsForm = app.forms.Options()
-		tasksFilterForm:initForm(luv:getSession())
-		logsFilterForm:initForm(luv:getSession())
+		tasksFilterForm:initForm(luv:session())
+		logsFilterForm:initForm(luv:session())
 		optionsForm:initForm(user.options)
 		luv:assign{
 			title="main";user=user;createTaskForm=createTaskForm;
