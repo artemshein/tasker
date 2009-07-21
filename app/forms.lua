@@ -87,16 +87,16 @@ local TasksFilter = forms.Form:extend{
 
 local LogsFilter = forms.Form:extend{
 	__tag = .....".LogsFilter";
-	Meta = {id="logsFilter";action="/ajax/log/filter-list.json";ajax='{success: onLogsFilter, dataType: "json"}';fields={"action";"mine"};widget=require "luv.forms.widgets".FlowForm()};
-	action = fields.Text{label=capitalize(tr "action");choices={{"create";tr "creating"};{"edit";tr "editing"};{"delete";tr "deleting"}}};
+	Meta = {id="logsFilter";action="/ajax/log/filter-list.json";ajax='{success: onLogsFilter, dataType: "json"}';fields={"act";"mine"};widget=require "luv.forms.widgets".FlowForm()};
+	act = fields.Text{label=capitalize(tr "action");choices={{"create";tr "creating"};{"edit";tr "editing"};{"delete";tr "deleting"}}};
 	mine = fields.Boolean{label=tr "my actions only";defaultValue=false};
 	filter = fields.Submit{defaultValue=capitalize(tr "filter")};
 	initModel = function (self, session)
-		session.logsFilter = {action=self.action;mine=self.mine}
+		session.logsFilter = {action=self.act;mine=self.mine}
 	end;
 	initForm = function (self, session)
 		local logsFilter = session.logsFilter or {}
-		self.action = logsFilter.action
+		self.act = logsFilter.action
 		self.mine = logsFilter.mine
 	end;
 }

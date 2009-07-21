@@ -9,8 +9,8 @@ local ws = require "luv.webservers"
 local json = require "luv.utils.json"
 
 luv:assign{
-	tr=tr;capitalize=string.capitalize;isEmpty=table.isEmpty;pairs=pairs;ipairs=ipairs;version=version;
-	date=os.date;
+	tr=tr;capitalize=string.capitalize;isEmpty=table.isEmpty;
+	pairs=pairs;ipairs=ipairs;version=version;date=os.date;
 }
 
 local function authUser (urlConf)
@@ -20,13 +20,13 @@ local function authUser (urlConf)
 end
 
 return {
-	--[[{"^/reinstall/?$"; function ()
+	{"^/reinstall/?$"; function ()
 		models.dropModels(models.Model.modelsList)
 		models.createModels(models.Model.modelsList)
 		local temiy = auth.models.User:create{login="temiy";name="Шеин Артём Александрович";passwordHash=auth.models.User:encodePassword "123456"}
 		app.models.Options:create{user=temiy}
 		luv:displayString "{{ safe(debugger) }}OK"
-	end};]]
+	end};
 	{"^/login/?$"; function (urlConf)
 		local loginForm = auth.forms.Login(luv:postData())
 		local user = auth.models.User:authUser(luv:session(), loginForm)
@@ -67,7 +67,7 @@ return {
 			ws.Http403()
 		end
 		local p = models.Paginator(app.models.Task, user.options and user.options.tasksPerPage or 10):order "-dateCreated"
-		local page = tonumber(luv:getPost "page") or 1
+		local page = tonumber(luv:post "page") or 1
 		local tasksFilter = luv:session().tasksFilter or {}
 		if tasksFilter.title and "" ~= tasksFilter.title then
 			p:filter{title__contains=tasksFilter.title}

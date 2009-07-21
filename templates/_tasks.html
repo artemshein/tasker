@@ -1,4 +1,4 @@
-{% if 0 == p:getTotal() then %}
+{% if 0 == p:total() then %}
 	Нет задач удовлетворяющих запросу.
 {% else %}
 	{% local pageNav = include("_pagenav.html", {func="showTasksPage"}) %}
@@ -14,11 +14,11 @@
 			class="new"
 		{% end %}
 	>
-		<td>{{ safe(task:getField "important":asAjax()) }}</td>
-		<td style="white-space:nowrap"><a href="/task/{{ task.pk }}"><img src="/images/help_16.png" width="16" height="16" alt="" /></a>{{ safe(task:getField "title":asAjax()) }}{% if task.createdBy == user then %} <a href="javascript:deleteTask({{task.pk}});"><img src="/images/remove_16.png" width="16" height="16" alt="Удалить задачу" /></a>{% end %}</td>
-		<td>{{ safe(task:getField "status":asAjax()) }}</td>
-		<td>{{ safe(task:getField "assignedTo":asAjax()) }}</td>
-		<td style="white-space:nowrap">{{ safe(task:getField "timeToBeDone":asAjax()) }}{{ safe(task:getField "dateToBeDone":asAjax()) }}</td>
+		<td>{{ safe(task:field "important":asAjax()) }}</td>
+		<td style="white-space:nowrap"><a href="/task/{{ task.pk }}"><img src="/images/help_16.png" width="16" height="16" alt="" /></a>{{ safe(task:field "title":asAjax()) }}{% if task.createdBy == user then %} <a href="javascript:deleteTask({{task.pk}});"><img src="/images/remove_16.png" width="16" height="16" alt="Удалить задачу" /></a>{% end %}</td>
+		<td>{{ safe(task:field "status":asAjax()) }}</td>
+		<td>{{ safe(task:field "assignedTo":asAjax()) }}</td>
+		<td style="white-space:nowrap">{{ safe(task:field "timeToBeDone":asAjax()) }}{{ safe(task:field "dateToBeDone":asAjax()) }}</td>
 		<td>{{ task.createdBy }}</td>
 	</tr>
 	{% end %}

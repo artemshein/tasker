@@ -1,4 +1,4 @@
-{% if 0 == p:getTotal() then %}
+{% if 0 == p:total() then %}
 	Нет записей.
 {% else %}
 	{% local pageNav = include("_pagenav.html", {func="showLogsPage"}) %}
