@@ -1,0 +1,26 @@
+Tasker ver.0.4alpha
+===================
+
+Tasker is tasks management web-service. Tasker is designed for small
+teams (up to 10-20 people).
+
+Features
+--------
+* Almost total AJAX interface.
+* Log of changes.
+* Powerful filters.
+
+How to install
+--------------
+1. Create /config.lua with configuration variables, example:
+------------------------------------------------------------------------
+tmpDir = "/var/tmp"
+sessionsDir = "/var/www/sessions"
+dsn = "mysql://tasker:passTasker@localhost/tasker"
+secretSalt = "asd*#35&5sfds#!a*&@fknd^f8572@2rg6#2,ei||32fbDHWQ&*$^"
+------------------------------------------------------------------------
+2. Give rights on write to tmpDir & sessionsDir.
+3. Uncomment and edit the reinstall section in app/urls.lua (change
+administrator name & password at least).
+4. Reinstall the system, go to http://<tasker base url>/reinstall.
+5. Comment the reinstall section back.

@@ -27,20 +27,24 @@ try(function ()
 
 	local cache = {backend = require "luv.cache.backend"}
 	local TagEmuWrapper, Memcached = cache.backend.TagEmuWrapper, cache.backend.Memcached
+	local baseDir = fs.Dir(string.slice(arg[0], 1, string.findLast(arg[0], "/") or string.findLast(arg[0], "\\")))
+
+	dofile"config.lua"
+	
 	-- Create Luv Core object with
 	luv = luv.init{
-		tmpDir = "/var/tmp";
-		sessionDir = "/var/www/sessions";
+		tmpDir = tmpDir;
+		sessionsDir = sessionsDir;
 		templatesDirs = {
-			"/var/www/tasker/templates";
+			baseDir / "templates";
 			"/usr/lib/lua/5.1/luv/contrib/admin/templates";
 		};
-		dsn = "mysql://tasker:sd429dbkewls@localhost/tasker";
+		dsn = dsn;
 		debugger = require "luv.dev.debuggers".Fire();
 	}
 	-- luv:setCacher(TagEmuWrapper(Memcached()):setLogger(function (msg) luv:debug(msg, "Cacher") end))
 	-- luv:getCacher():clear()
-	auth.models.User:setSecretSalt "asd*#35&5sd^f8572@2rg6#2,ei||32fbDHWQ&*$^"
+	auth.models.User:setSecretSalt(secretSalt)
 	if not luv:dispatch "app/urls.lua" then
 		ws.Http404()
 	end
