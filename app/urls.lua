@@ -20,13 +20,13 @@ local function authUser (urlConf)
 end
 
 return {
-	{"^/reinstall/?$"; function ()
+	--[[{"^/reinstall/?$"; function ()
 		models.dropModels(models.Model.modelsList)
 		models.createModels(models.Model.modelsList)
 		local temiy = auth.models.User:create{login="temiy";name="Шеин Артём Александрович";passwordHash=auth.models.User:encodePassword "123456"}
 		app.models.Options:create{user=temiy}
 		luv:displayString "{{ safe(debugger) }}OK"
-	end};
+	end};]]
 	{"^/login/?$"; function (urlConf)
 		local loginForm = auth.forms.Login(luv:postData())
 		local user = auth.models.User:authUser(luv:session(), loginForm)
@@ -116,26 +116,26 @@ return {
 			end
 		end
 	end};
-	{"^/task/(%d+)/?$"; function (urlConf, taskId)
+	{"^/ajax/task/(%d+)/save.json"; function (urlConf, taskId)
 		local user = authUser(urlConf)
 		local task = app.models.Task:find(taskId)
 		if not task then
 			ws.Http404()
 		end
 		local f = app.forms.EditTask(luv:postData())
-		if f:submitted() then
-			if f:valid() then
-				f:initModel(task)
-				task:update()
-				app.models.Log:logTaskEdit(task, user)
-				io.write(json.serialize{result="ok"})
-			else
-				io.write(json.serialize{result="error";errors=f:errors()})
-			end
-			return
-		else
-			f:initForm(task)
-		end
+		f:processAjaxForm(function (self)
+			self:initModel(task)
+			task:update()
+			app.models.Log:logTaskEdit(task, user)
+		end)
+	end};
+	{"^/task/(%d+)/?$"; function (urlConf, taskId)
+		local user = authUser(urlConf)
+		local task = app.models.Task:find(taskId)
+		if not task then ws.Http404() end
+		local f = app.forms.EditTask()
+		f:action("/ajax/task/"..taskId.."/save.json")
+		f:initForm(task)
 		luv:assign{title=tostring(task);user=user;task=task;editTaskForm=f}
 		luv:display "task.html"
 	end};

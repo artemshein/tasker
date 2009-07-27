@@ -1,11 +1,20 @@
 {[ extends "base.html" ]}
 
 {[ section "content" ]}
+<script type="text/javascript" language="JavaScript">//<![CDATA[
+	function onTaskSave (data)
+	{
+		if ("ok" == data.result)
+			alert("Задача успешно обновлена.");
+		else
+			showErrors(data.errors);
+	}
+//]]></script>
 <a href="/">&larr; На главную</a>
 <div id="accordion">
 <h1><a href="#">Задача "{{ task }}"</a></h1>
 <div>
-	{% if editTaskForm:isSubmitted() and not editTaskForm:isValid() then %}
+	{% if editTaskForm:submitted() and not editTaskForm:valid() then %}
 		{{ include("_msgs-and-errors.html", {form=editTaskForm}) }}
 	{% end %}
 	{{ safe(editTaskForm) }}

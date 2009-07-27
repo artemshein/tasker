@@ -17,7 +17,7 @@ local Task = models.Model:extend{
 	_ajaxUrl = "/ajax/task/field-set.json";
 	newStatuses = {"";"new";"новое";"новая";"новый"};
 	doneStatuses = {"done";"finished";"completed";"сделано";"сделан";"сделана";"готово";"готова";"готов";"завершено";"закончено";"закончена";"закончен";"выполнено";"выполнена"};
-	title = fields.Text{required=true;label=capitalize(tr "title")};
+	title = fields.Text{required=true;label=capitalize(tr "title");classes={"big"}};
 	description = fields.Text{maxLength=false;label=capitalize(tr "description")}:addClasses{"huge";"resizable"};
 	dateCreated = fields.Datetime{autoNow=true};
 	createdBy = references.ManyToOne{references=auth.models.User;required=true;choices=auth.models.User:all()}:ajaxWidget(widgets.Select());

@@ -23,7 +23,7 @@ local CreateTask = forms.ModelForm:extend{
 
 local EditTask = forms.ModelForm:extend{
 	__tag = .....".EditTask";
-	Meta = {model=app.models.Task;fields={"title";"assignedTo";"dateToBeDone";"timeToBeDone";"important";"description"}};
+	Meta = {model=app.models.Task;id="editTask";ajax='{success: onTaskSave, dataType: "json"}';fields={"title";"assignedTo";"dateToBeDone";"timeToBeDone";"important";"description"}};
 	save = fields.Submit{defaultValue=capitalize(tr "save")};
 }
 
