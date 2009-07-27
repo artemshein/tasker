@@ -3,6 +3,7 @@ return {
 action="действие";
 administrator="администратор";
 apply="применить";
+["Artyom Shein"]="Шеин Артём";
 authorisation="авторизация";
 -- C
 create="создать";
@@ -41,6 +42,7 @@ main="главная";
 -- N
 new="новая";
 ["new password"]="новый пароль";
+["new task"]="новая задача";
 ["not completed"]="не законченная";
 -- O
 ["only that for me"]="только то, что касается меня";
@@ -57,12 +59,17 @@ register="зарегистрироваться";
 -- S
 save="сохранить";
 status="статус";
+-- L
+["log of changes"]="журнал изменений";
 -- T
 tasker="задачник";
+["tasks list"]="список задач";
 ["tasks per page"]="задач на странице";
 ["term (date)"]="сроки (дата)";
 ["term (time)"]="сроки (время)";
 title="название";
+-- U
+["user's options"]="настройки пользователя";
 -- V
 version="версия";
 -- W

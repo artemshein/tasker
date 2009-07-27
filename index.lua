@@ -1,5 +1,3 @@
-PRODUCTION = false -- Not used
-
 for _, path in ipairs{"/usr/lib/lua/5.1/";"/usr/share/lua/5.1/";"/usr/local/lib/lua/5.1/";"/usr/local/share/lua/5.1/"} do
 	package.cpath = (package.cpath or "?.so")..";"..path.."?.so"
 	package.path = (package.path or "?.lua")..";"..path.."?.lua;"..path.."?/init.lua"
@@ -9,8 +7,7 @@ luv = require "luv"
 local exceptions = require "luv.exceptions"
 local Exception, try = exceptions.Exception, exceptions.try
 
-local i18n = require "luv.i18n".I18n("app/i18n", "ru_RU")
-tr = function (str) return i18n:tr(str) or str end
+tr = function (str) return i18n and i18n:tr(str) or str end
 
 local auth, utils, html, fs
 

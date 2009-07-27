@@ -3,7 +3,7 @@
 {% else %}
 	{% local pageNav = include("_pagenav.html", {func="showTasksPage"}) %}
 	{{ pageNav }}
-	<table><thead><tr><td>!</td><td>Название</td><td>Статус</td><td>Исполнитель</td><td>Срок</td><td>Автор</td></tr></thead><tbody>
+	<table><thead><tr><td>!</td><td>{{ capitalize(tr "title") }}</td><td>{{ capitalize(tr "status") }}</td><td>{{ capitalize(tr "assigned to") }}</td><td>{{ capitalize(tr "term") }}</td><td>{{ capitalize(tr "author") }}</td></tr></thead><tbody>
 	{% for _, task in tasks() do %}
 	<tr
 		{% if task:isDone() then %}

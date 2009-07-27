@@ -3,7 +3,7 @@
 {% else %}
 	{% local pageNav = include("_pagenav.html", {func="showLogsPage"}) %}
 	{{ pageNav }}
-	<table><thead><tr><td>Действие</td><td>Пользователь</td><td>Дата и время</td></tr></thead><tbody>
+	<table><thead><tr><td>{{ capitalize(tr "action") }}</td><td>{{ capitalize(tr "user") }}</td><td>{{ capitalize(tr "date and time") }}</td></tr></thead><tbody>
 	{% for _, log in logs() do %}
 		<td>
 		{% if "create" == log.action then %}

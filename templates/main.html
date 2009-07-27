@@ -60,14 +60,14 @@
 	}
 //]]></script>
 <div id="accordion">
-	<h1><a href="#">Новая задача</a></h1>
+	<h1><a href="#">{{ capitalize(tr "new task") }}</a></h1>
 	<div>
 		{% if createTaskForm:submitted() then %}
 			{{ include("_msgs-and-errors.html", {form=createTaskForm}) }}
 		{% end %}
 		{{ safe(createTaskForm) }}
 	</div>
-	<h1><a href="#">Список задач</a></h1>
+	<h1><a href="#">{{ capitalize(tr "tasks list") }}</a></h1>
 	<div>
 		{{ safe(tasksFilterForm) }}
 		<div id="tasks"></div>
@@ -82,7 +82,7 @@
 			showTasksPage($.cookie("tasksPage") || 1);
 		//]]></script>
 	</div>
-	<h1><a href="#">История изменений</a></h1>
+	<h1><a href="#">{{ capitalize(tr "log of changes") }}</a></h1>
 	<div>
 		{{ safe(logsFilterForm) }}
 		<div id="logs"></div>
@@ -96,7 +96,7 @@
 			showLogsPage();
 		//]]></script>
 	</div>
-	<h1><a href="#">Настройки пользователя</a></h1>
+	<h1><a href="#">{{ capitalize(tr "user's options") }}</a></h1>
 	<div>
 		{{ safe(optionsForm) }}
 	</div>

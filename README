@@ -18,6 +18,7 @@ tmpDir = "/var/tmp"
 sessionsDir = "/var/www/sessions"
 dsn = "mysql://tasker:passTasker@localhost/tasker"
 secretSalt = "asd*#35&5sfds#!a*&@fknd^f8572@2rg6#2,ei||32fbDHWQ&*$^"
+-- i18n = require "luv.i18n".I18n("app/i18n", "ru_RU") -- for l10n
 ------------------------------------------------------------------------
 2. Give rights on write to tmpDir & sessionsDir.
 3. Uncomment and edit the reinstall section in app/urls.lua (change
