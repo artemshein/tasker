@@ -4,7 +4,11 @@ action="действие";
 administrator="администратор";
 apply="применить";
 ["Artyom Shein"]="Шеин Артём";
+["assigned to"]="исполнитель";
+author="автор";
 authorisation="авторизация";
+-- B
+["back to main"]="назад на главную";
 -- C
 create="создать";
 creating="создание";
@@ -12,6 +16,7 @@ copyright="копирайт";
 completed="законченная";
 ["current password"]="текущий пароль";
 -- D
+["date and time"]="дата и время";
 department="отдел";
 description="описание";
 deleting="удаление";
@@ -34,6 +39,7 @@ help="помощь";
 ["Invalid authorisation data."]="Неверные учетные данные.";
 -- L
 ["log in"]="войти";
+["log of changes"]="журнал изменений";
 login="логин";
 logout="выйти";
 -- M
@@ -59,17 +65,20 @@ register="зарегистрироваться";
 -- S
 save="сохранить";
 status="статус";
--- L
-["log of changes"]="журнал изменений";
 -- T
+task="задача";
 tasker="задачник";
 ["tasks list"]="список задач";
 ["tasks per page"]="задач на странице";
+term="срок";
 ["term (date)"]="сроки (дата)";
 ["term (time)"]="сроки (время)";
 title="название";
+["Task updated successfully."]="Задача успешно обновлена.";
 -- U
+user="пользователь";
 ["user's options"]="настройки пользователя";
+["user's manual"]="руководство пользователя";
 -- V
 version="версия";
 -- W

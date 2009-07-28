@@ -11,7 +11,7 @@ label{color:#444}
 input[type="checkbox"], input[type="text"], input[type="password"], textarea, select {border:solid 1px #CCC;background-color:#FFF;padding:2px;margin:2px 0;color:#444}
 input.tiny, input.time{width:64px}
 input.small, input.date{width:80px}
-input.big{width:250px}
+input.big{width:220px}
 textarea.huge{width:600px;height:300px}
 input.datetime{width:160px}
 input[type="text"].required, input[type="password"].required, textarea.required, select.required {background-color:#FFD}

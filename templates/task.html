@@ -5,14 +5,14 @@
 	function onTaskSave (data)
 	{
 		if ("ok" == data.result)
-			alert("Задача успешно обновлена.");
+			alert("{{ tr"Task updated successfully." }}");
 		else
 			showErrors(data.errors);
 	}
 //]]></script>
-<a href="/">&larr; На главную</a>
+<a href="/">&larr; {{ capitalize(tr"back to main") }}</a>
 <div id="accordion">
-<h1><a href="#">Задача "{{ task }}"</a></h1>
+<h1><a href="#">{{ capitalize(tr"task") }} "{{ task }}"</a></h1>
 <div>
 	{% if editTaskForm:submitted() and not editTaskForm:valid() then %}
 		{{ include("_msgs-and-errors.html", {form=editTaskForm}) }}

@@ -16,6 +16,7 @@ try(function ()
 	fs = require "luv.fs"
 end):catch(function (e)
 	io.write ("Content-type: text/html\n\n<pre>"..tostring(e))
+	os.exit()
 end)
 
 version = utils.Version(0, 4, 1, "alpha")
