@@ -41,7 +41,7 @@ try(function ()
 		debugger = require "luv.dev.debuggers".Fire();
 	}
 	luv:db():logger(function (sql, result) luv:debug(sql..", returns "..("table" == type(result) and (#result.." rows") or tostring(result)), "Database") end)
-	luv:cacher():logger(function (sql, result) luv:debug(sql..result, "Cacher") end)
+	luv:cacher():logger(function (sql, result) luv:debug(sql..", returns "..("table" == type(result) and (#result.." rows") or tostring(result)), "Cacher") end)
 	-- luv:setCacher(TagEmuWrapper(Memcached()):setLogger(function (msg) luv:debug(msg, "Cacher") end))
 	-- luv:getCacher():clear()
 	auth.models.User:secretSalt(secretSalt)
