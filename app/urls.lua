@@ -23,8 +23,8 @@ return {
 	--[[{".*"; function ()
 		io.write"<pre>"
 		require"luv.tests".all:run()
-	end};
-	{"^/reinstall/?$"; function ()
+	end};]]
+	--[[{"^/reinstall/?$"; function ()
 		models.dropModels(models.Model.modelsList)
 		models.createModels(models.Model.modelsList)
 		local temiy = auth.models.User:create{login="temiy";name="Шеин Артём Александрович";passwordHash=auth.models.User:encodePassword "123456"}
