@@ -1,0 +1,46 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=utf-8">
+	<meta name="author" content="Artyom Shein">
+
+	<title>{{ capitalize(tr(title or "")) }} - {{ capitalize(tr "tasker") }}</title>
+
+	<link rel="stylesheet" type="text/css" href="/css/blueprint/screen.css" media="screen, projection" />
+	<link rel="stylesheet" type="text/css" href="/css/blueprint/print.css" media="print" />
+	<!--[if IE]><link rel="stylesheet" href="/css/blueprint/ie.css" type="text/css" media="screen, projection"><![endif]-->
+	<link rel="stylesheet" type="text/css" href="/css/start/jquery-ui-1.7.2.custom.css" media="all" />
+	<link rel="stylesheet" type="text/css" href="/css/common.css" media="screen, projection" />
+	<script type="text/javascript" language="JavaScript" src="/js/luv/luv.js"></script>
+	<script type="text/javascript" language="JavaScript" src="/js/ui/i18n/ui.datepicker-ru.js"></script>
+</head>
+
+<body>
+
+<table id="report"><thead>
+<tr><td>{{ capitalize(tr"tasks") }} / {{ tr"days" }}</td>
+{% local months = {"January";"February";"March";"April";"May";"June";"July";"August";"September";"October";"November";"December"} %}
+{% for i = 1, daysTotal do %}
+	{% local dt = date("*t", beginDate + (i-1)*24*60*60) %}
+	<td>{% if i == 1 or dt.day == 1 then %}{{ (tr"%(month)s %(day)s") % {month=tr(months[dt.month]);day=dt.day} }}{% else %}{{ dt.day }}{% end %}</td>
+{% end %}
+</tr></thead>
+<tbody>
+{% for _, task in ipairs(tasks) do %}
+<tr>
+	<td>{{ task }}</td>
+	{%
+		local skipFirst = math.floor((task.dateCreated-beginDate)/(24*60*60))
+	%}
+	{% if skipFirst > 0 then %}
+		<td colspan="{{ skipFirst }}"></td>
+	{% end %}
+	<td colspan="{{ daysTotal-skipFirst }}" {% if task:isDone() then %}class="done"{% elseif task:isNew() then %}class="new"{% end %}>{{ task }}: {{ task.createdBy }}{% if task.assignedTo then %} &rarr; {{ task.assignedTo }}{% end %}</td>
+</tr>
+{% end %}
+</tbody></table>
+
+{{ safe(debugger) }}
+</body>
+</html>

@@ -1,12 +1,12 @@
 local tr = tr
-local forms = require "luv.forms"
-local auth = require "luv.contrib.auth"
-local fields = require "luv.fields"
-local models = require "luv.db.models"
+local forms = require"luv.forms"
+local auth = require"luv.contrib.auth"
+local fields = require"luv.fields"
+local models = require"luv.db.models"
 local Q = models.Q
-local app = {models=require "app.models";forms=require "app.forms"}
-local ws = require "luv.webservers"
-local json = require "luv.utils.json"
+local app = {models=require"app.models";forms=require"app.forms"}
+local ws = require"luv.webservers"
+local json = require"luv.utils.json"
 
 luv:assign{
 	tr=tr;capitalize=string.capitalize;isEmpty=table.isEmpty;
@@ -20,10 +20,10 @@ local function authUser (urlConf)
 end
 
 return {
-	--[[{".*"; function ()
+	{"^/test/?$"; function ()
 		io.write"<pre>"
 		require"luv.tests".all:run()
-	end};]]
+	end};
 	--[[{"^/reinstall/?$"; function ()
 		models.dropModels(models.Model.modelsList)
 		models.createModels(models.Model.modelsList)
@@ -38,7 +38,7 @@ return {
 			luv:responseHeader("Location", "/"):sendHeaders()
 		end
 		luv:assign{title="authorisation";loginForm=loginForm}
-		luv:display "login.html"
+		luv:display"login.html"
 	end};
 	{"^/logout/?$"; function (urlConf)
 		local user = authUser(urlConf)
@@ -51,8 +51,8 @@ return {
 		if not findLogsForm:submitted() or not findLogsForm:valid() then
 			ws.Http403()
 		end
-		local p = models.Paginator(app.models.Log, 50):order "-dateTime"
-		local page = tonumber(luv:post "page") or 1
+		local p = models.Paginator(app.models.Log, 50):order"-dateTime"
+		local page = tonumber(luv:post"page") or 1
 		local logsFilter = luv:session().logsFilter or {}
 		if logsFilter.action and "" ~= logsFilter.action then
 			p:filter{action=logsFilter.action}
@@ -61,17 +61,17 @@ return {
 			p:filter{user=user}
 		end
 		luv:assign{p=p;page=page;logs=p:page(page)}
-		luv:display "_logs.html"
+		luv:display"_logs.html"
 	end};
 	{"^/ajax/task/list/?$"; function (urlConf)
-		-- Отфильтрованный список задач
+		-- Filtered tasks list
 		local user = authUser(urlConf)
 		local findTasksForm = app.forms.FindTasks(luv:postData())
 		if not findTasksForm:submitted() or not findTasksForm:valid() then
 			ws.Http403()
 		end
-		local p = models.Paginator(app.models.Task, user.options and user.options.tasksPerPage or 10):order "-dateCreated"
-		local page = tonumber(luv:post "page") or 1
+		local p = models.Paginator(app.models.Task, user.options and user.options.tasksPerPage or 10):order"-dateCreated"
+		local page = tonumber(luv:post"page") or 1
 		local tasksFilter = luv:session().tasksFilter or {}
 		if tasksFilter.title and "" ~= tasksFilter.title then
 			p:filter{title__contains=tasksFilter.title}
@@ -92,7 +92,7 @@ return {
 			end
 		end
 		luv:assign{user=user;p=p;page=page;tasks=p:page(page)}
-		luv:display "_tasks.html"
+		luv:display"_tasks.html"
 	end};
 	{"/ajax/task/field%-set%.json"; function ()
 		local user = authUser(urlConf)
@@ -141,7 +141,7 @@ return {
 		f:action("/ajax/task/"..taskId.."/save.json")
 		f:initForm(task)
 		luv:assign{title=tostring(task);user=user;task=task;editTaskForm=f}
-		luv:display "task.html"
+		luv:display"task.html"
 	end};
 	{"^/registration/?$"; function (urlConf)
 		local f = app.forms.Registration(luv:postData())
@@ -153,16 +153,16 @@ return {
 					f:addErrors(user:errors())
 				else
 					app.models.Options:create{user=user}
-					f:addMsg 'Регистрация прошла успешно. Теперь Вы можете <a href="/">авторизоваться</a>.'
+					f:addMsg(tr'Sign up complete. Now you can <a href="/">log in</a>.')
 					f:values{}
 				end
 			end
 		end
-		luv:assign{title="Регистрация";registrationForm=f}
+		luv:assign{title=tr"sign up";registrationForm=f}
 		luv:display "registration.html"
 	end};
 	{"^/ajax/task/filter%-list%.json$"; function (urlConf)
-		-- Применение фильтра
+		-- Filtering
 		local user = authUser(urlConf)
 		local f = app.forms.TasksFilter(luv:postData())
 		if f:submitted() then
@@ -178,7 +178,7 @@ return {
 		end
 	end};
 	{"^/ajax/log/filter%-list%.json$"; function (urlConf)
-		-- Применение фильтра
+		-- Filtering
 		local user = authUser(urlConf)
 		local f = app.forms.LogsFilter(luv:postData())
 		if f:submitted() then
@@ -195,7 +195,7 @@ return {
 	end};
 	{"^/help/?$"; function ()
 		luv:assign{title="Помощь"}
-		luv:display "help.html"
+		luv:display"help.html"
 	end};
 	{"^/ajax/task/create%.json$"; function (urlConf)
 		local user = authUser(urlConf)
@@ -213,12 +213,12 @@ return {
 		local f = app.forms.Options(luv:postData())
 		f:processAjaxForm(function (f)
 			if not user:comparePassword(f.password) then
-				f:addError(tr "Wrong password.")
+				f:addError(tr"Wrong password.")
 				return false
 			end
 			if "" ~= f.newPassword then
 				if f.newPassword ~= f.newPassword2 then
-					f:addError(tr "Passwords don't match.")
+					f:addError(tr"Passwords don't match.")
 					return false
 				else
 					user.passwordHash = auth.models.User:encodePassword(f.newPassword)
@@ -251,6 +251,23 @@ return {
 			tasksFilterForm=tasksFilterForm;
 			logsFilterForm=logsFilterForm;optionsForm=optionsForm;
 		}
-		luv:display "main.html"
+		luv:display"main.html"
+	end};
+	{"^/report/?$"; function (urlConf)
+		local user = authUser(urlConf)
+		local tasks = app.models.Task:all():order"dateCreated":value()
+		local beginDate = os.date("*t", tasks[1].dateCreated)
+		beginDate.hour = 0 beginDate.min = 0 beginDate.sec = 0
+		beginDate = os.time(beginDate)
+		local endDate = os.date("*t", tasks[#tasks].dateCreated)
+		endDate.hour = 0 endDate.min = 0 endDate.sec = 0
+		endDate = os.time(endDate)
+		local daysTotal = math.ceil((endDate-beginDate)/(24*60*60))+1
+		luv:assign{
+			math=math;
+			user=user;users=auth.models.User:all():value();tasks=tasks;
+			beginDate=beginDate;endDate=endDate;daysTotal=daysTotal;
+		}
+		luv:display"report.html"
 	end};
 }

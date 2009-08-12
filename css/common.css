@@ -40,3 +40,8 @@ div.pages a{margin-left:10px;text-decoration:none}
 #tasks table tr.new td{background-color:#DFD !important}
 #tasks table tr.done td{background-color:#DDD !important}
 #tasks table thead tr td,#logs table thead tr td{font-weight:bold;background-color:#DDF;padding:8px;text-align:center}
+
+#report{width:auto;border-collapse:collapse}
+#report td{border:solid 1px #CCC}
+#report td.done{background-color:#EEE}
+#report td.new{background-color:#EFE}

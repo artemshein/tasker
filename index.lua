@@ -25,7 +25,7 @@ try(function ()
 
 	local cache = {backend = require "luv.cache.backend"}
 	local TagEmuWrapper, Memcached = cache.backend.TagEmuWrapper, cache.backend.Memcached
-	local baseDir = fs.Dir(string.slice(arg[0], 1, string.findLast(arg[0], "/") or string.findLast(arg[0], "\\")))
+	local baseDir = fs.Dir(arg[0]:slice(1, arg[0]:findLast"/" or arg[0]:findLast"\\"))
 
 	dofile"config.lua"
 	
@@ -40,7 +40,7 @@ try(function ()
 		dsn = dsn;
 		debugger = require "luv.dev.debuggers".Fire();
 	}
-	--luv:db():logger(function (sql, result) luv:debug(sql..", returns "..("table" == type(result) and (#result.." rows") or tostring(result)), "Database") end)
+	luv:db():logger(function (sql, result) luv:debug(sql..", returns "..("table" == type(result) and "table" or tostring(result)), "Database") end)
 	--luv:cacher():logger(function (sql, result) luv:debug(sql..", returns "..("table" == type(result) and (#result.." rows") or tostring(result)), "Cacher") end)
 	-- luv:setCacher(TagEmuWrapper(Memcached()):setLogger(function (msg) luv:debug(msg, "Cacher") end))
 	-- luv:getCacher():clear()
@@ -51,17 +51,17 @@ try(function ()
 
 end):catch(ws.Http403, function () -- HTTP 403 Forbidden
 
-	luv:setResponseCode(403):sendHeaders()
+	luv:responseCode(403):sendHeaders()
 	io.write "403 Forbidden"
 
 end):catch(ws.Http404, function () -- HTTP 404 Not Found
 
-	luv:setResponseCode(404):sendHeaders()
+	luv:responseCode(404):sendHeaders()
 	io.write "404 Not Found"
 
 end):catch(function (e) -- Catch all exceptions
 
-	if luv and luv.isKindOf then luv:setResponseCode(500) end
+	if luv and luv.isA then luv:responseCode(500) end
 	io.write("<br />Exception: ", html.escape(tostring(e)))
 
 end)

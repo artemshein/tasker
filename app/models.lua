@@ -27,13 +27,13 @@ local Task = models.Model:extend{
 	important = fields.Boolean{label=tr "priority task";defaultValue=false};
 	status = fields.Text{label=capitalize(tr "current state");defaultValue=tr "new"}:addClass "tiny";
 	isNew = function (self)
-		if not self.status or table.ifind(self.newStatuses, string.utf8lower(self.status)) then
+		if not self.status or table.ifind(self.newStatuses, self.status:lower()) then
 			return true
 		end
 		return false
 	end;
 	isDone = function (self)
-		if self.status and table.ifind(self.doneStatuses, string.utf8lower(self.status)) then
+		if self.status and table.ifind(self.doneStatuses, self.status:lower()) then
 			return true
 		end
 		return false
@@ -49,10 +49,10 @@ local Log = models.Model:extend{
 	text = fields.Text{required=true};
 	dateTime = fields.Datetime{autoNow=true};
 	logTaskCreate = function (self, task, user)
-		self:create{user=user;action="create";text="<a href="..string.format("%q", "/task/"..task.pk)..">"..tostring(task).."</a>"}
+		self:create{user=user;action="create";text="<a href="..("%q"):format("/task/"..task.pk)..">"..tostring(task).."</a>"}
 	end;
 	logTaskEdit = function (self, task, user, field, value)
-		self:create{user=user;action="edit";text="<a href="..string.format("%q", "/task/"..task.pk)..">"..tostring(task).."</a>"}
+		self:create{user=user;action="edit";text="<a href="..("%q"):format("/task/"..task.pk)..">"..tostring(task).."</a>"}
 	end;
 	logTaskDelete = function (self, task, user)
 		self:create{user=user;action="delete";text=tostring(task)}
