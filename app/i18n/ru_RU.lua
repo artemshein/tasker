@@ -38,6 +38,7 @@ February="февраля";
 filter="отфильтровать";
 ["forgot password"]="забыл пароль";
 ["full name"]="полное имя";
+["full report"]="полный отчет";
 -- H
 help="помощь";
 -- J
@@ -76,6 +77,7 @@ password="пароль";
 register="зарегистрироваться";
 ["repeat new password"]="повторите новый пароль";
 ["repeat password"]="повторите пароль";
+reports="отчеты";
 ["RSC Energia"]="РКК Энергия";
 -- S
 save="сохранить";

@@ -259,7 +259,7 @@ return {
 		local beginDate = os.date("*t", tasks[1].dateCreated)
 		beginDate.hour = 0 beginDate.min = 0 beginDate.sec = 0
 		beginDate = os.time(beginDate)
-		local endDate = os.date("*t", tasks[#tasks].dateCreated)
+		local endDate = os.date("*t", math.max(tasks[#tasks].dateCreated, os.time()))
 		endDate.hour = 0 endDate.min = 0 endDate.sec = 0
 		endDate = os.time(endDate)
 		local daysTotal = math.ceil((endDate-beginDate)/(24*60*60))+1
