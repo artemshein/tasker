@@ -9,7 +9,7 @@ local ws = require"luv.webservers"
 local json = require"luv.utils.json"
 
 luv:assign{
-	tr=tr;capitalize=string.capitalize;isEmpty=table.isEmpty;
+	tr=tr;capitalize=string.capitalize;empty=table.empty;
 	pairs=pairs;ipairs=ipairs;version=version;date=os.date;
 }
 
