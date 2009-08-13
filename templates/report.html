@@ -19,17 +19,17 @@
 <body>
 
 <table id="report"><thead>
-<tr><td>{{ capitalize(tr"tasks") }} / {{ tr"days" }}</td>
+<tr><th>{{ capitalize(tr"tasks") }} / {{ tr"days" }}</th>
 {% local months = {"January";"February";"March";"April";"May";"June";"July";"August";"September";"October";"November";"December"} %}
 {% for i = 1, daysTotal do %}
 	{% local dt = date("*t", beginDate + (i-1)*24*60*60) %}
-	<td>{% if i == 1 or dt.day == 1 then %}{{ (tr"%(month)s %(day)s") % {month=tr(months[dt.month]);day=dt.day} }}{% else %}{{ dt.day }}{% end %}</td>
+	<th>{% if i == 1 or dt.day == 1 then %}{{ (tr"%(month)s %(day)s") % {month=tr(months[dt.month]);day=dt.day} }}{% else %}{{ dt.day }}{% end %}</td>
 {% end %}
-</tr></thead>
+</th></thead>
 <tbody>
 {% for _, task in ipairs(tasks) do %}
 <tr>
-	<td>{{ task }}</td>
+	<th>{{ task }}</th>
 	{%
 		local skipFirst = math.floor((task.dateCreated-beginDate)/(24*60*60))
 	%}

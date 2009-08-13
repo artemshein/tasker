@@ -19,6 +19,12 @@ local function authUser (urlConf)
 	return user
 end
 
+local function requireAuth (func)
+	return function (urlConf, ...)
+		return func(urlConf, authUser(urlConf), ...)
+	end 
+end
+
 return {
 	{"^/test/?$"; function ()
 		io.write"<pre>"
@@ -40,13 +46,11 @@ return {
 		luv:assign{title="authorisation";loginForm=loginForm}
 		luv:display"login.html"
 	end};
-	{"^/logout/?$"; function (urlConf)
-		local user = authUser(urlConf)
+	{"^/logout/?$"; requireAuth(function (urlConf, user)
 		user:logout(luv:session())
 		luv:responseHeader("Location", "/"):sendHeaders()
-	end};
-	{"^/ajax/log/list/?$"; function (urlConf)
-		local user = authUser(urlConf)
+	end)};
+	{"^/ajax/log/list/?$"; requireAuth(function (urlConf, user)
 		local findLogsForm = app.forms.FindLogs(luv:postData())
 		if not findLogsForm:submitted() or not findLogsForm:valid() then
 			ws.Http403()
@@ -62,10 +66,9 @@ return {
 		end
 		luv:assign{p=p;page=page;logs=p:page(page)}
 		luv:display"_logs.html"
-	end};
-	{"^/ajax/task/list/?$"; function (urlConf)
+	end)};
+	{"^/ajax/task/list/?$"; requireAuth(function (urlConf, user)
 		-- Filtered tasks list
-		local user = authUser(urlConf)
 		local findTasksForm = app.forms.FindTasks(luv:postData())
 		if not findTasksForm:submitted() or not findTasksForm:valid() then
 			ws.Http403()
@@ -93,9 +96,8 @@ return {
 		end
 		luv:assign{user=user;p=p;page=page;tasks=p:page(page)}
 		luv:display"_tasks.html"
-	end};
-	{"/ajax/task/field%-set%.json"; function ()
-		local user = authUser(urlConf)
+	end)};
+	{"/ajax/task/field%-set%.json"; requireAuth(function (urlConf, user)
 		local res = app.models.Task:ajaxHandler(luv:postData())
 		if not res then
 			ws.Http404()
@@ -103,9 +105,8 @@ return {
 		local post = luv:postData()
 		app.models.Log:logTaskEdit(app.models.Task:find(post.id), user)
 		io.write(res)
-	end};
-	{"/ajax/task/delete%.json"; function ()
-		local user = authUser()
+	end)};
+	{"/ajax/task/delete%.json"; requireAuth(function (urlConf, user)
 		local f = app.forms.DeleteTask(luv:postData())
 		if f:submitted() then
 			if f:valid() then
@@ -119,9 +120,8 @@ return {
 				io.write(json.serialize{result="error";errors=f:errors()})
 			end
 		end
-	end};
-	{"^/ajax/task/(%d+)/save.json"; function (urlConf, taskId)
-		local user = authUser(urlConf)
+	end)};
+	{"^/ajax/task/(%d+)/save.json"; requireAuth(function (urlConf, user, taskId)
 		local task = app.models.Task:find(taskId)
 		if not task then
 			ws.Http404()
@@ -132,9 +132,8 @@ return {
 			task:update()
 			app.models.Log:logTaskEdit(task, user)
 		end)
-	end};
-	{"^/task/(%d+)/?$"; function (urlConf, taskId)
-		local user = authUser(urlConf)
+	end)};
+	{"^/task/(%d+)/?$"; requireAuth(function (urlConf, user, taskId)
 		local task = app.models.Task:find(taskId)
 		if not task then ws.Http404() end
 		local f = app.forms.EditTask()
@@ -142,7 +141,7 @@ return {
 		f:initForm(task)
 		luv:assign{title=tostring(task);user=user;task=task;editTaskForm=f}
 		luv:display"task.html"
-	end};
+	end)};
 	{"^/registration/?$"; function (urlConf)
 		local f = app.forms.Registration(luv:postData())
 		if f:submitted() then
@@ -161,9 +160,8 @@ return {
 		luv:assign{title=tr"sign up";registrationForm=f}
 		luv:display "registration.html"
 	end};
-	{"^/ajax/task/filter%-list%.json$"; function (urlConf)
+	{"^/ajax/task/filter%-list%.json$"; requireAuth(function (urlConf, user)
 		-- Filtering
-		local user = authUser(urlConf)
 		local f = app.forms.TasksFilter(luv:postData())
 		if f:submitted() then
 			if f:valid() then
@@ -176,10 +174,9 @@ return {
 		else
 			ws.Http404()
 		end
-	end};
-	{"^/ajax/log/filter%-list%.json$"; function (urlConf)
+	end)};
+	{"^/ajax/log/filter%-list%.json$"; requireAuth(function (urlConf, user)
 		-- Filtering
-		local user = authUser(urlConf)
 		local f = app.forms.LogsFilter(luv:postData())
 		if f:submitted() then
 			if f:valid() then
@@ -192,13 +189,12 @@ return {
 		else
 			ws.Http404()
 		end
-	end};
+	end)};
 	{"^/help/?$"; function ()
 		luv:assign{title="Помощь"}
 		luv:display"help.html"
 	end};
-	{"^/ajax/task/create%.json$"; function (urlConf)
-		local user = authUser(urlConf)
+	{"^/ajax/task/create%.json$"; requireAuth(function (urlConf, user)
 		local f = app.forms.CreateTask(luv:postData())
 		f:processAjaxForm(function (f)
 			local task = app.models.Task()
@@ -207,9 +203,8 @@ return {
 			task:insert()
 			app.models.Log:logTaskCreate(task, user)
 		end)
-	end};
-	{"^/ajax/save%-options%.json"; function (urlConf)
-		local user = authUser(urlConf)
+	end)};
+	{"^/ajax/save%-options%.json"; requireAuth(function (urlConf, user)
 		local f = app.forms.Options(luv:postData())
 		f:processAjaxForm(function (f)
 			if not user:comparePassword(f.password) then
@@ -236,9 +231,8 @@ return {
 				return false
 			end
 		end)
-	end};
-	{"^/?$"; function (urlConf)
-		local user = authUser(urlConf)
+	end)};
+	{"^/?$"; requireAuth(function (urlConf, user)
 		local createTaskForm = app.forms.CreateTask()
 		local tasksFilterForm = app.forms.TasksFilter()
 		local logsFilterForm = app.forms.LogsFilter()
@@ -252,9 +246,8 @@ return {
 			logsFilterForm=logsFilterForm;optionsForm=optionsForm;
 		}
 		luv:display"main.html"
-	end};
-	{"^/report/?$"; function (urlConf)
-		local user = authUser(urlConf)
+	end)};
+	{"^/report/?$"; requireAuth(function (urlConf, user)
 		local tasks = app.models.Task:all():order"dateCreated":value()
 		local beginDate = os.date("*t", tasks[1].dateCreated)
 		beginDate.hour = 0 beginDate.min = 0 beginDate.sec = 0
@@ -269,5 +262,5 @@ return {
 			beginDate=beginDate;endDate=endDate;daysTotal=daysTotal;
 		}
 		luv:display"report.html"
-	end};
+	end)};
 }
