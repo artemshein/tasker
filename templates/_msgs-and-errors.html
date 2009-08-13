@@ -1,11 +1,11 @@
-{% if not isEmpty(form:msgs()) then %}
+{% if not empty(form:msgs()) then %}
 	<div id="msgs">
 	{% for _, msg in ipairs(form:msgs()) do %}
 		{{ safe(msg) }}<br />
 	{% end %}
 	</div>
 {% end %}
-{% if not isEmpty(form:errors()) then %}
+{% if not empty(form:errors()) then %}
 	<div id="errors">
 	<h4>Ошибка!</h4>
 	{% for _, error in ipairs(form:errors()) do %}
