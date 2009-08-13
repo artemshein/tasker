@@ -1,9 +1,9 @@
 {[ extends "base.html" ]}
 
 {[ section "content" ]}
-<a href="/">&larr; На главную</a>
+<a href="/">&larr; {{ ("back to main"):tr():capitalize() }}</a>
 <div id="accordion">
-<h1><a href="#">Регистрация</a></h1>
+<h1><a href="#">{{ ("sign up"):tr():capitalize() }}</a></h1>
 <div>
 	{{ include("_msgs-and-errors.html", {form=registrationForm}) }}
 	{{ safe(registrationForm) }}

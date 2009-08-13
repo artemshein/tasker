@@ -5,7 +5,7 @@
 	<meta http-equiv="content-type" content="text/html; charset=utf-8">
 	<meta name="author" content="Artyom Shein">
 
-	<title>{{ capitalize(tr(title or "")) }} - {{ capitalize(tr "tasker") }}</title>
+	<title>{{ title or "" }} - {{ ("tasker"):tr():capitalize() }}</title>
 
 	<link rel="stylesheet" type="text/css" href="/css/blueprint/screen.css" media="screen, projection" />
 	<link rel="stylesheet" type="text/css" href="/css/blueprint/print.css" media="print" />
@@ -19,11 +19,11 @@
 <body>
 
 <table id="report"><thead>
-<tr><th>{{ capitalize(tr"tasks") }} / {{ tr"days" }}</th>
+<tr><th>{{ ("tasks"):tr():capitalize() }} / {{ ("days"):tr() }}</th>
 {% local months = {"January";"February";"March";"April";"May";"June";"July";"August";"September";"October";"November";"December"} %}
 {% for i = 1, daysTotal do %}
 	{% local dt = date("*t", beginDate + (i-1)*24*60*60) %}
-	<th>{% if i == 1 or dt.day == 1 then %}{{ (tr"%(month)s %(day)s") % {month=tr(months[dt.month]);day=dt.day} }}{% else %}{{ dt.day }}{% end %}</td>
+	<th>{% if i == 1 or dt.day == 1 then %}{{ ("%(month)s %(day)s"):tr() % {month=months[dt.month]:tr();day=dt.day} }}{% else %}{{ dt.day }}{% end %}</td>
 {% end %}
 </th></thead>
 <tbody>

@@ -1,9 +1,9 @@
 {% if 0 == p:total() then %}
-	Нет записей.
+	{{ ("No records."):tr() }}
 {% else %}
 	{% local pageNav = include("_pagenav.html", {func="showLogsPage"}) %}
 	{{ pageNav }}
-	<table><thead><tr><td>{{ capitalize(tr "action") }}</td><td>{{ capitalize(tr "user") }}</td><td>{{ capitalize(tr "date and time") }}</td></tr></thead><tbody>
+	<table><thead><tr><td>{{ ("action"):tr():capitalize() }}</td><td>{{ ("user"):tr():capitalize() }}</td><td>{{ ("date and time"):tr():capitalize() }}</td></tr></thead><tbody>
 	{% for _, log in logs() do %}
 		<td>
 		{% if "create" == log.action then %}
@@ -16,7 +16,7 @@
 		{{ safe(log.text) }}
 		</td>
 		<td>{{ log.user }}</td>
-		<td>{{ date("%H:%M:%S %d.%m.%Y", log.dateTime) }}</td>
+		<td>{{ date("%c", log.dateTime) }}</td>
 	</tr>
 	{% end %}
 	</tbody></table>

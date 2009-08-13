@@ -1,9 +1,9 @@
 {% if 0 == p:total() then %}
-	Нет задач удовлетворяющих запросу.
+	{{ ("No tasks satisfying the request."):tr() }}
 {% else %}
 	{% local pageNav = include("_pagenav.html", {func="showTasksPage"}) %}
 	{{ pageNav }}
-	<table><thead><tr><td>!</td><td>{{ capitalize(tr "title") }}</td><td>{{ capitalize(tr "status") }}</td><td>{{ capitalize(tr "assigned to") }}</td><td>{{ capitalize(tr "term") }}</td><td>{{ capitalize(tr "author") }}</td></tr></thead><tbody>
+	<table><thead><tr><td>!</td><td>{{ ("title"):tr():capitalize() }}</td><td>{{ ("status"):tr():capitalize() }}</td><td>{{ ("assigned to"):tr():capitalize() }}</td><td>{{ ("term"):tr():capitalize() }}</td><td>{{ ("author"):tr():capitalize() }}</td></tr></thead><tbody>
 	{% for _, task in tasks() do %}
 	<tr
 		{% if task:isDone() then %}
@@ -14,11 +14,11 @@
 			class="new"
 		{% end %}
 	>
-		<td>{{ safe(task:field "important":asAjax()) }}</td>
-		<td style="white-space:nowrap"><a href="/task/{{ task.pk }}"><img src="/images/help_16.png" width="16" height="16" alt="" /></a>{{ safe(task:field "title":asAjax()) }}{% if task.createdBy == user then %} <a href="javascript:deleteTask({{task.pk}});"><img src="/images/remove_16.png" width="16" height="16" alt="Удалить задачу" /></a>{% end %}</td>
-		<td>{{ safe(task:field "status":asAjax()) }}</td>
-		<td>{{ safe(task:field "assignedTo":asAjax()) }}</td>
-		<td style="white-space:nowrap">{{ safe(task:field "timeToBeDone":asAjax()) }}{{ safe(task:field "dateToBeDone":asAjax()) }}</td>
+		<td>{{ safe(task:field"important":asAjax()) }}</td>
+		<td style="white-space:nowrap"><a href="/task/{{ task.pk }}"><img src="/images/help_16.png" width="16" height="16" alt="{{ ("detalied info"):tr():capitalize() }}" title="{{ ("detalied info"):tr():capitalize() }}" /></a>{{ safe(task:field"title":asAjax()) }}{% if task.createdBy == user then %} <a href="javascript:deleteTask({{task.pk}});"><img src="/images/remove_16.png" width="16" height="16" title="{{ ("delete task"):tr():capitalize() }}" alt="{{ ("delete task"):tr():capitalize() }}" /></a>{% end %}</td>
+		<td>{{ safe(task:field"status":asAjax()) }}</td>
+		<td>{{ safe(task:field"assignedTo":asAjax()) }}</td>
+		<td style="white-space:nowrap">{{ safe(task:field"timeToBeDone":asAjax()) }}{{ safe(task:field"dateToBeDone":asAjax()) }}</td>
 		<td>{{ task.createdBy }}</td>
 	</tr>
 	{% end %}

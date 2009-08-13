@@ -10,8 +10,14 @@ module(...)
 
 local CreateTask = forms.ModelForm:extend{
 	__tag = .....".CreateTask";
-	Meta = {model=app.models.Task;id="createTask";action="/ajax/task/create.json";ajax='{success: onTaskCreate, dataType: "json"}';fields={"title";"assignedTo";"dateToBeDone";"timeToBeDone";"important";"description"}};
-	create = fields.Submit{defaultValue=capitalize(tr "create")};
+	Meta = {
+		model=app.models.Task;
+		id="createTask";
+		action="/ajax/task/create.json";
+		ajax='{success: onTaskCreate, dataType: "json"}';
+		fields={"title";"assignedTo";"dateToBeDone";"timeToBeDone";"important";"description"}
+	};
+	create = fields.Submit(("create"):tr():capitalize());
 	init = function (self, ...)
 		forms.ModelForm.init(self, ...)
 		local dateId = self:field "dateToBeDone":id()
@@ -23,40 +29,45 @@ local CreateTask = forms.ModelForm:extend{
 
 local EditTask = forms.ModelForm:extend{
 	__tag = .....".EditTask";
-	Meta = {model=app.models.Task;id="editTask";ajax='{success: onTaskSave, dataType: "json"}';fields={"title";"assignedTo";"dateToBeDone";"timeToBeDone";"important";"description"}};
-	save = fields.Submit{defaultValue=capitalize(tr "save")};
+	Meta = {
+		model=app.models.Task;
+		id="editTask";
+		ajax='{success: onTaskSave, dataType: "json"}';
+		fields={"title";"assignedTo";"dateToBeDone";"timeToBeDone";"important";"description"}
+	};
+	save = fields.Submit(("save"):tr():capitalize());
 }
 
 local DeleteTask = forms.Form:extend{
 	__tag = .....".DeleteTask";
 	id = app.models.Task:field "id":clone();
-	delete = fields.Submit{defaultValue=capitalize(tr "delete")};
+	delete = fields.Submit(("delete"):tr():capitalize());
 }
 
 local FindTasks = forms.Form:extend{
 	__tag = .....".FindTasks";
-	find = fields.Submit{defaultValue=capitalize(tr "find")};
+	find = fields.Submit(("find"):tr():capitalize());
 }
 
 local FindLogs = forms.Form:extend{
 	__tag = .....".FindLogs";
-	find = fields.Submit{defaultValue=capitalize(tr "find")};
+	find = fields.Submit(("find"):tr():capitalize());
 }
 
 local Registration = forms.Form:extend{
 	__tag = .....".Registration";
 	Meta = {fields={"login";"password";"repeatPassword";"name";"email"}};
 	login = auth.models.User:field "login":clone();
-	password = fields.Password{required=true;label=capitalize(tr "password")};
-	repeatPassword = fields.Password{required=true;label=capitalize(tr "repeat password")};
-	name = auth.models.User:field "name":clone():required(true):label(capitalize(tr "full name"));
+	password = fields.Password{required=true;label=("password"):tr():capitalize()};
+	repeatPassword = fields.Password{required=true;label=("repeat password"):tr():capitalize()};
+	name = auth.models.User:field "name":clone():required(true):label(("full name"):tr():capitalize());
 	email = auth.models.User:field "email":clone():required(true);
-	register = fields.Submit{defaultValue=capitalize(tr "register")};
+	register = fields.Submit(("register"):tr():capitalize());
 	isValid = function (self)
 		local res = forms.Form.valid(self)
 		if self.password ~= self.repeatPassword then
 			res = false
-			self:addError(tr "Passwords don't match.")
+			self:addError(("Passwords don't match."):tr())
 		end
 		return res
 	end;
@@ -69,11 +80,26 @@ local Registration = forms.Form:extend{
 
 local TasksFilter = forms.Form:extend{
 	__tag = .....".TasksFilter";
-	Meta = {id="tasksFilter";action="/ajax/task/filter-list.json";ajax='{success: onTasksFilter, dataType: "json"}';fields={"title";"status";"self"};widget=require "luv.forms.widgets".FlowForm()};
-	title = fields.Text{label=capitalize(tr "in title")};
-	status = fields.Text{label=capitalize(tr "status");choices={{"new";tr "new"};{"inProgress";tr "in progress"};{"notCompleted";tr "not completed"};{"completed";tr "completed"}};widget=require "luv.fields.widgets".Select()};
-	self = fields.Boolean{label=tr "only that for me";defaultValue=false};
-	filter = fields.Submit{defaultValue=capitalize(tr "filter")};
+	Meta = {
+		id="tasksFilter";
+		action="/ajax/task/filter-list.json";
+		ajax='{success: onTasksFilter, dataType: "json"}';
+		fields={"title";"status";"self"};
+		widget=require"luv.forms.widgets".FlowForm();
+	};
+	title = fields.Text{label=("in title"):tr():capitalize()};
+	status = fields.Text{
+		label=("status"):tr():capitalize();
+		choices={
+			{"new";("new"):tr()};
+			{"inProgress";("in progress"):tr()};
+			{"notCompleted";("not completed"):tr()};
+			{"completed";("completed"):tr()}
+		};
+		widget=require"luv.fields.widgets".Select();
+	};
+	self = fields.Boolean{label=("only that for me"):tr();defaultValue=false};
+	filter = fields.Submit(("filter"):tr():capitalize());
 	initModel = function (self, session)
 		session.tasksFilter = {title=self.title;status=self.status;self=self.self}
 	end;
@@ -87,10 +113,23 @@ local TasksFilter = forms.Form:extend{
 
 local LogsFilter = forms.Form:extend{
 	__tag = .....".LogsFilter";
-	Meta = {id="logsFilter";action="/ajax/log/filter-list.json";ajax='{success: onLogsFilter, dataType: "json"}';fields={"act";"mine"};widget=require "luv.forms.widgets".FlowForm()};
-	act = fields.Text{label=capitalize(tr "action");choices={{"create";tr "creating"};{"edit";tr "editing"};{"delete";tr "deleting"}}};
-	mine = fields.Boolean{label=tr "my actions only";defaultValue=false};
-	filter = fields.Submit{defaultValue=capitalize(tr "filter")};
+	Meta = {
+		id="logsFilter";
+		action="/ajax/log/filter-list.json";
+		ajax='{success: onLogsFilter, dataType: "json"}';
+		fields={"act";"mine"};
+		widget=require"luv.forms.widgets".FlowForm();
+	};
+	act = fields.Text{
+		label = ("action"):tr():capitalize();
+		choices = {
+			{"create";("creating"):tr()};
+			{"edit";("editing"):tr()};
+			{"delete";("deleting"):tr()};
+		};
+	};
+	mine = fields.Boolean{label=("my actions only"):tr();defaultValue=false};
+	filter = fields.Submit(("filter"):tr():capitalize());
 	initModel = function (self, session)
 		session.logsFilter = {action=self.act;mine=self.mine}
 	end;
@@ -103,20 +142,36 @@ local LogsFilter = forms.Form:extend{
 
 local Options = forms.ModelForm:extend{
 	__tag = .....".Options";
-	Meta = {model=app.models.Options;id="options";action="/ajax/save-options.json";ajax='{success: onOptionsSave, dataType: "json"}';fields={"fullName";"tasksPerPage";"newPassword";"newPassword2";"password"}};
-	fullName = auth.models.User:clone():field "name":required(true):label(capitalize(tr "full name"));
-	newPassword = fields.Password{label=capitalize(tr "new password");hint=tr "Fill in only if you want to change password."};
-	newPassword2 = fields.Password{label=capitalize(tr "repeat new password");hint=tr "Fill in only if you want to change password."};
-	password = fields.Password{required=true;label=capitalize(tr "current password")};
-	apply = fields.Submit{defaultValue=capitalize(tr "apply")};
+	Meta = {
+		model=app.models.Options;
+		id="options";
+		action="/ajax/save-options.json";
+		ajax='{success: onOptionsSave, dataType: "json"}';
+		fields={"fullName";"tasksPerPage";"newPassword";"newPassword2";"password"};
+	};
+	fullName = auth.models.User:clone():field"name":required(true):label(("full name"):tr():capitalize());
+	newPassword = fields.Password{label=("new password"):tr():capitalize();hint=("Fill in only if you want to change password."):tr()};
+	newPassword2 = fields.Password{label=("repeat new password"):tr():capitalize();hint=("Fill in only if you want to change password."):tr()};
+	password = fields.Password{required=true;label=("current password"):tr():capitalize()};
+	apply = fields.Submit{defaultValue=("apply"):tr():capitalize()};
 	initForm = function (self, options)
 		forms.ModelForm.initForm(self, options)
 		self.fullName = options.user.name
 	end;
 }
 
+local Report = forms.Form:extend{
+	__tag = .....".Report";
+	Meta = {fields={"from";"till";"self"}};
+	from = fields.Date{label=("from date"):tr():capitalize()};
+	till = fields.Date{label=("till date"):tr():capitalize()};
+	self = fields.Boolean{label=("only that for me"):tr();defaultValue=false};
+	report = fields.Submit(("report"):tr():capitalize())
+}
+
 return {
 	CreateTask=CreateTask;EditTask=EditTask;DeleteTask=DeleteTask;
 	FindTasks=FindTasks;FindLogs=FindLogs;Registration=Registration;
 	TasksFilter=TasksFilter;LogsFilter=LogsFilter;Options=Options;
+	Report=Report;
 }

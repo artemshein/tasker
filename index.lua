@@ -3,35 +3,37 @@ for _, path in ipairs{"/usr/lib/lua/5.1/";"/usr/share/lua/5.1/";"/usr/local/lib/
 	package.path = (package.path or "?.lua")..";"..path.."?.lua;"..path.."?/init.lua"
 end
 
-luv = require "luv"
-local exceptions = require "luv.exceptions"
+luv = require"luv"
+local exceptions = require"luv.exceptions"
 local Exception, try = exceptions.Exception, exceptions.try
-
-tr = function (str) return i18n and i18n:tr(str) or str end
+local ws = require"luv.webservers"
 
 local auth, utils, html, fs
 
 try(function ()
-	auth, utils, html, ws = require "luv.contrib.auth", require "luv.utils", require "luv.utils.html", require "luv.webservers"
-	fs = require "luv.fs"
+	auth, utils, html, ws = require"luv.contrib.auth", require"luv.utils", require"luv.utils.html", require"luv.webservers"
+	fs = require"luv.fs"
 end):catch(function (e)
 	io.write ("Content-type: text/html\n\n<pre>"..tostring(e))
 	os.exit()
 end)
 
-version = utils.Version(0, 4, 1, "alpha")
+version = utils.Version(0, 4, 3, "alpha")
 
 try(function ()
 
 	local cache = {backend = require "luv.cache.backend"}
 	local TagEmuWrapper, Memcached = cache.backend.TagEmuWrapper, cache.backend.Memcached
 	local baseDir = fs.Dir(arg[0]:slice(1, arg[0]:findLast"/" or arg[0]:findLast"\\"))
-
-	dofile"config.lua"
 	
+	
+	dofile"config.lua"
+	-- I18n
+	local cgi = ws.Cgi(tmpDir)
 	-- Create Luv Core object with
 	luv = luv.init{
-		tmpDir = tmpDir;
+		wsApi = cgi;
+		i18n = require"luv.i18n".I18n("app/i18n", cgi:cookie"language" or cgi);
 		sessionsDir = sessionsDir;
 		templatesDirs = {
 			baseDir / "templates";
@@ -45,7 +47,7 @@ try(function ()
 	-- luv:setCacher(TagEmuWrapper(Memcached()):setLogger(function (msg) luv:debug(msg, "Cacher") end))
 	-- luv:getCacher():clear()
 	auth.models.User:secretSalt(secretSalt)
-	if not luv:dispatch "app/urls.lua" then
+	if not luv:dispatch"app/urls.lua" then
 		ws.Http404()
 	end
 

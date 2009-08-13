@@ -1,9 +1,9 @@
 {[ extends "base.html" ]}
 
 {[ section "content" ]}
-<a href="/">&larr; {{ capitalize(tr"back to main") }}</a>
+<a href="/">&larr; {{ ("back to main"):tr():capitalize() }}</a>
 <div id="accordion">
-	<h1><a href="#">{{ capitalize(tr"user's manual") }}</a></h1>
+	<h1><a href="#">{{ ("user's manual"):tr():capitalize() }}</a></h1>
 	<div>
 		<h2>Кратко</h2>
 		<ul>

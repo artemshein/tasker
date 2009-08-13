@@ -7,7 +7,7 @@
 {% end %}
 {% if not empty(form:errors()) then %}
 	<div id="errors">
-	<h4>Ошибка!</h4>
+	<h4>{{ ("errors"):tr():capitalilze() }}</h4>
 	{% for _, error in ipairs(form:errors()) do %}
 		{{ safe(error) }}<br />
 	{% end %}

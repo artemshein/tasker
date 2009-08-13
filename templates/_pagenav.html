@@ -5,7 +5,7 @@
 		{% if count > onPage then %}
 			{% local start = page*onPage-onPage %}
 		{% end %}
-	Страницы:
+	{{ ("pages"):tr():capitalize() }}:
 	{% for i = 1, pages do %}
 		{% if page == i then %}
 			<span>{{ i }}</span>

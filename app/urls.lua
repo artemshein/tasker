@@ -9,8 +9,8 @@ local ws = require"luv.webservers"
 local json = require"luv.utils.json"
 
 luv:assign{
-	tr=tr;capitalize=string.capitalize;empty=table.empty;
-	pairs=pairs;ipairs=ipairs;version=version;date=os.date;
+	empty=table.empty;pairs=pairs;ipairs=ipairs;version=version;
+	date=os.date;luv=luv;
 }
 
 local function authUser (urlConf)
@@ -244,6 +244,7 @@ return {
 			title="main";user=user;createTaskForm=createTaskForm;
 			tasksFilterForm=tasksFilterForm;
 			logsFilterForm=logsFilterForm;optionsForm=optionsForm;
+			reportForm=app.forms.Report();
 		}
 		luv:display"main.html"
 	end)};

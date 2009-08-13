@@ -17,15 +17,15 @@ local Task = models.Model:extend{
 	_ajaxUrl = "/ajax/task/field-set.json";
 	newStatuses = {"";"new";"новое";"новая";"новый"};
 	doneStatuses = {"done";"finished";"completed";"сделано";"сделан";"сделана";"готово";"готова";"готов";"завершено";"закончено";"закончена";"закончен";"выполнено";"выполнена"};
-	title = fields.Text{required=true;label=capitalize(tr "title");classes={"big"}};
-	description = fields.Text{maxLength=false;label=capitalize(tr "description")}:addClasses{"huge";"resizable"};
+	title = fields.Text{required=true;label=("title"):tr():capitalize();classes={"big"}};
+	description = fields.Text{maxLength=false;label=("description"):tr():capitalize()}:addClasses{"huge";"resizable"};
 	dateCreated = fields.Datetime{autoNow=true};
 	createdBy = references.ManyToOne{references=auth.models.User;required=true;choices=auth.models.User:all()}:ajaxWidget(widgets.Select());
-	assignedTo = references.ManyToOne{references=auth.models.User;label=capitalize(tr "executor");choices=auth.models.User:all()}:ajaxWidget(widgets.Select());
-	dateToBeDone = fields.Date{label=capitalize(tr "term (date)")};
-	timeToBeDone = fields.Time{label=capitalize(tr "term (time)")};
-	important = fields.Boolean{label=tr "priority task";defaultValue=false};
-	status = fields.Text{label=capitalize(tr "current state");defaultValue=tr "new"}:addClass "tiny";
+	assignedTo = references.ManyToOne{references=auth.models.User;label=("executor"):tr():capitalize();choices=auth.models.User:all()}:ajaxWidget(widgets.Select());
+	dateToBeDone = fields.Date{label=("term (date)"):tr():capitalize()};
+	timeToBeDone = fields.Time{label=("term (time)"):tr():capitalize()};
+	important = fields.Boolean{label=("priority task"):tr();defaultValue=false};
+	status = fields.Text{label=("current state"):tr():capitalize();defaultValue=("new"):tr()}:addClass"tiny";
 	isNew = function (self)
 		if not self.status or table.ifind(self.newStatuses, self.status:lower()) then
 			return true
@@ -63,7 +63,7 @@ local Options = models.Model:extend{
 	__tag = .....".Options";
 	Meta = {labels={"options";"options"}};
 	user = references.OneToOne{references=auth.models.User;required=true};
-	tasksPerPage = fields.Int{label=capitalize(tr "tasks per page");defaultValue=10;required=true;choices={{10;10};{20;20};{30;30};{40;40};{50;50}}};
+	tasksPerPage = fields.Int{label=("tasks per page"):tr():capitalize();defaultValue=10;required=true;choices={{10;10};{20;20};{30;30};{40;40};{50;50}}};
 }
 
 return {Task=Task;Log=Log;Options=Options}

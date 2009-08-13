@@ -26,7 +26,7 @@
 		{
 			showTasksPage();
 			showLogsPage();
-			alert("Задача успешно создана.");
+			alert({{ ("%q"):format(("Task has been created successfuly."):tr()) }});
 			$("#createTask").clearForm();
 			$("#accordion").accordion("activate", 1);
 		}
@@ -35,7 +35,7 @@
 	}
 	function deleteTask (id)
 	{
-		if (!confirm("Подтверждаете УДАЛЕНИЕ задачи?"))
+		if (!confirm({{ ("%q"):format(("Confirm task deletion?"):tr()) }}))
 			return false;
 		$.post("/ajax/task/delete.json", {id: id, "delete": "Delete"}, function (data) {
 			if ("ok" == data.result)
@@ -49,7 +49,7 @@
 		if ("ok" == data.result)
 		{
 			showTasksPage();
-			alert("Настройки успешно сохранены.");
+			alert({{ ("%q"):format(("Options have been saved successfuly."):tr()) }});
 			$("#optionsNewPassword").val("");
 			$("#optionsNewPassword2").val("");
 			$("#optionsPassword").val("");
@@ -60,14 +60,14 @@
 	}
 //]]></script>
 <div id="accordion">
-	<h1><a href="#">{{ capitalize(tr "new task") }}</a></h1>
+	<h1><a href="#">{{ ("new task"):tr():capitalize() }}</a></h1>
 	<div>
 		{% if createTaskForm:submitted() then %}
 			{{ include("_msgs-and-errors.html", {form=createTaskForm}) }}
 		{% end %}
 		{{ safe(createTaskForm) }}
 	</div>
-	<h1><a href="#">{{ capitalize(tr "tasks list") }}</a></h1>
+	<h1><a href="#">{{ ("tasks list"):tr():capitalize() }}</a></h1>
 	<div>
 		{{ safe(tasksFilterForm) }}
 		<div id="tasks"></div>
@@ -82,7 +82,7 @@
 			showTasksPage($.cookie("tasksPage") || 1);
 		//]]></script>
 	</div>
-	<h1><a href="#">{{ capitalize(tr "log of changes") }}</a></h1>
+	<h1><a href="#">{{ ("log of changes"):tr():capitalize() }}</a></h1>
 	<div>
 		{{ safe(logsFilterForm) }}
 		<div id="logs"></div>
@@ -96,11 +96,12 @@
 			showLogsPage();
 		//]]></script>
 	</div>
-	<h1><a href="#">{{ capitalize(tr "reports") }}</a></h1>
+	<h1><a href="#">{{ ("reports"):tr():capitalize() }}</a></h1>
 	<div>
-		<a href="/report">{{ capitalize(tr "full report") }}</a>
+		{{ safe(reportForm) }}
+		<a href="/report">{{ ("full report"):tr():capitalize() }}</a>
 	</div>
-	<h1><a href="#">{{ capitalize(tr "user's options") }}</a></h1>
+	<h1><a href="#">{{ ("user's options"):tr():capitalize() }}</a></h1>
 	<div>
 		{{ safe(optionsForm) }}
 	</div>

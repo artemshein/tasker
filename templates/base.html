@@ -5,7 +5,7 @@
 	<meta http-equiv="content-type" content="text/html; charset=utf-8">
 	<meta name="author" content="Artyom Shein">
 
-	<title>{{ capitalize(tr(title or "")) }} - {{ capitalize(tr "tasker") }}</title>
+	<title>{{ title and title:tr():capitalize() or "" }} - {{ ("tasker"):tr():capitalize() }}</title>
 
 	<link rel="stylesheet" type="text/css" href="/css/blueprint/screen.css" media="screen, projection" />
 	<link rel="stylesheet" type="text/css" href="/css/blueprint/print.css" media="print" />
@@ -20,14 +20,36 @@
 
 <div class="container">
 
+<script type="text/javascript" language="JavaScript">//<![CDATA[
+	function setLang (lang)
+	{
+		jQuery.cookie("language", lang);
+		document.location = document.location;
+	}
+//]]></script>
+
 <div id="info">
-	<div class="user-info">{% if user then %}{{ capitalize(tr "you are") }} {{ user }} [<a href="/logout">{{ tr "logout" }} &rarr;</a>]{% else %}<a href="javascript:void(0)" onclick="alert('Обращайся к администратору.')">{{ capitalize(tr "forgot password") }}</a> | <a href="/registration">{{ capitalize(tr "register") }}</a>{% end %}</div>
-	<h1>{{ capitalize(tr "tasker") }}&trade; <small>{{ tr "version" }} {{ version }}</small></h1>
+	<div class="user-info">
+		{% if user then %}{{ ("you are"):tr():capitalize() }} {{ user }} [<a href="/logout">{{ ("logout"):tr() }} &rarr;</a>]{% else %}<a href="javascript:void(0)" onclick="alert('Call the administrator.')">{{ ("forgot password"):tr():capitalize() }}</a> | <a href="/registration">{{ ("register"):tr():capitalize() }}</a>{% end %}
+		<div id="langBar" style="text-align:right">
+			{% if luv:i18n():lang() then %}
+				<a href="javascript:setLang('en')">In English</a>
+			{% else %}
+				<span class="active">In English</span>
+			{% end %} |
+			{% if "ru" ~= luv:i18n():lang() then %}
+				<a href="javascript:setLang('ru')">По-русски</a>
+			{% else %}
+				<span class="active">По-русски</span>
+			{% end %}
+		</div>
+	</div>
+	<h1>{{ ("tasker"):tr():capitalize() }}&trade; <small>{{ ("version"):tr() }} {{ version }}</small></h1>
 </div>
 
 {[ section "content" ]}
 {[ endSection() ]}
-<a href="/help">{{ capitalize(tr "help") }}</a> | {{ capitalize(tr "copyright") }} &copy; 2009 {{ capitalize(tr "Artyom Shein") }}.
+<a href="/help">{{ ("help"):tr():capitalize() }}</a> | {{ ("copyright"):tr():capitalize() }} &copy; 2009 {{ ("Artyom Shein"):tr():capitalize() }}.
 </div>
 {{ safe(debugger) }}
 </body>
