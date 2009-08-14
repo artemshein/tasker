@@ -37,6 +37,7 @@ return {
 		app.models.Options:create{user=temiy}
 		luv:displayString "{{ safe(debugger) }}OK"
 	end};]]
+	{"^/admin"; require"luv.contrib.admin".AdminSite(luv, require"luv.contrib.auth".modelsAdmins(), app.models.admin):urls()};
 	{"^/login/?$"; function (urlConf)
 		local loginForm = auth.forms.Login(luv:postData())
 		local user = auth.models.User:authUser(luv:session(), loginForm)

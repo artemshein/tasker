@@ -14,14 +14,17 @@ How to install
 --------------
 1. Create /config.lua with configuration variables, example:
 ------------------------------------------------------------------------
+-- where to store POST temporary files
 tmpDir = "/var/tmp"
+-- where to store sessions' files
 sessionsDir = "/var/www/sessions"
+-- DB connection string
 dsn = "mysql://tasker:passTasker@localhost/tasker"
+-- unique salt for passwords (keep it secret)
 secretSalt = "asd*#35&5sfds#!a*&@fknd^f8572@2rg6#2,ei||32fbDHWQ&*$^"
--- i18n = require "luv.i18n".I18n("app/i18n", "ru_RU") -- for l10n
 ------------------------------------------------------------------------
 2. Give rights on write to tmpDir & sessionsDir.
 3. Uncomment and edit the reinstall section in app/urls.lua (change
-administrator name & password at least).
+administrator's name & password at least).
 4. Reinstall the system, go to http://<tasker base url>/reinstall.
 5. Comment the reinstall section back.
