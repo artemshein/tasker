@@ -7,16 +7,16 @@ luv = require"luv"
 local exceptions = require"luv.exceptions"
 local Exception, try = exceptions.Exception, exceptions.try
 local ws = require"luv.webservers"
+local utils, html = require"luv.utils", require"luv.utils.html"
 
-local auth, utils, html, fs
+--[[local auth, utils, html, fs
 
 try(function ()
-	auth, utils, html, ws = require"luv.contrib.auth", require"luv.utils", require"luv.utils.html", require"luv.webservers"
-	fs = require"luv.fs"
+	
 end):catch(function (e)
 	io.write ("Content-type: text/html\n\n<pre>"..tostring(e))
 	os.exit()
-end)
+end)]]
 
 version = utils.Version(0, 4, 3, "alpha")
 
@@ -24,11 +24,11 @@ try(function ()
 
 	local cache = {backend = require "luv.cache.backend"}
 	local TagEmuWrapper, Memcached = cache.backend.TagEmuWrapper, cache.backend.Memcached
+	local fs = require"luv.fs"
 	local baseDir = fs.Dir(arg[0]:slice(1, arg[0]:findLast"/" or arg[0]:findLast"\\"))
 	
-	
 	dofile"config.lua"
-	-- I18n
+	
 	local cgi = ws.Cgi(tmpDir)
 	-- Create Luv Core object with
 	luv = luv.init{
@@ -46,7 +46,7 @@ try(function ()
 	--luv:cacher():logger(function (sql, result) luv:debug(sql..", returns "..("table" == type(result) and (#result.." rows") or tostring(result)), "Cacher") end)
 	-- luv:setCacher(TagEmuWrapper(Memcached()):setLogger(function (msg) luv:debug(msg, "Cacher") end))
 	-- luv:getCacher():clear()
-	auth.models.User:secretSalt(secretSalt)
+	require"luv.contrib.auth".models.User:secretSalt(secretSalt)
 	if not luv:dispatch"app/urls.lua" then
 		ws.Http404()
 	end
@@ -54,12 +54,12 @@ try(function ()
 end):catch(ws.Http403, function () -- HTTP 403 Forbidden
 
 	luv:responseCode(403):sendHeaders()
-	io.write "403 Forbidden"
+	io.write"403 Forbidden"
 
 end):catch(ws.Http404, function () -- HTTP 404 Not Found
 
 	luv:responseCode(404):sendHeaders()
-	io.write "404 Not Found"
+	io.write"404 Not Found"
 
 end):catch(function (e) -- Catch all exceptions
 

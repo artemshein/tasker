@@ -54,8 +54,8 @@ local FindLogs = forms.Form:extend{
 	find = fields.Submit(("find"):tr():capitalize());
 }
 
-local Registration = forms.Form:extend{
-	__tag = .....".Registration";
+local SignUp = forms.Form:extend{
+	__tag = .....".SignUp";
 	Meta = {fields={"login";"password";"repeatPassword";"name";"email"}};
 	login = auth.models.User:field "login":clone();
 	password = fields.Password{required=true;label=("password"):tr():capitalize()};
@@ -171,7 +171,7 @@ local Report = forms.Form:extend{
 
 return {
 	CreateTask=CreateTask;EditTask=EditTask;DeleteTask=DeleteTask;
-	FindTasks=FindTasks;FindLogs=FindLogs;Registration=Registration;
+	FindTasks=FindTasks;FindLogs=FindLogs;SignUp=SignUp;
 	TasksFilter=TasksFilter;LogsFilter=LogsFilter;Options=Options;
 	Report=Report;
 }

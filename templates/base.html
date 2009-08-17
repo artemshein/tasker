@@ -30,7 +30,7 @@
 
 <div id="info">
 	<div class="user-info">
-		{% if user then %}{{ ("you are"):tr():capitalize() }} {{ user }} [<a href="/logout">{{ ("logout"):tr() }} &rarr;</a>]{% else %}<a href="javascript:void(0)" onclick="alert('Call the administrator.')">{{ ("forgot password"):tr():capitalize() }}</a> | <a href="/registration">{{ ("register"):tr():capitalize() }}</a>{% end %}
+		{% if user then %}{{ ("you are"):tr():capitalize() }} {{ user }} [<a href="/logout">{{ ("logout"):tr() }} &rarr;</a>]{% else %}<a href="javascript:void(0)" onclick="alert('Call the administrator.')">{{ ("forgot password"):tr():capitalize() }}</a> | <a href="/sign_up">{{ ("sign up"):tr():capitalize() }}</a>{% end %}
 		<div id="langBar" style="text-align:right">
 			{% if luv:i18n():lang() then %}
 				<a href="javascript:setLang('en')">In English</a>
@@ -44,7 +44,7 @@
 			{% end %}
 		</div>
 	</div>
-	<h1>{{ ("tasker"):tr():capitalize() }}&trade; <small>{{ ("version"):tr() }} {{ version }}</small></h1>
+	<h1>{{ ("tasker"):tr():capitalize() }}&trade; <small>{{ ("version"):tr() }} {{ version }}</small> {{ ("and"):tr() }} <a href="/todo/">{{ ("ToDo list"):tr() }}</a></h1>
 </div>
 
 {[ section "content" ]}

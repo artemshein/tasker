@@ -26,7 +26,7 @@
 		{
 			showTasksPage();
 			showLogsPage();
-			alert({{ ("%q"):format(("Task has been created successfuly."):tr()) }});
+			alert("{{ ("Task has been created successfuly."):tr() }}");
 			$("#createTask").clearForm();
 			$("#accordion").accordion("activate", 1);
 		}
@@ -35,7 +35,7 @@
 	}
 	function deleteTask (id)
 	{
-		if (!confirm({{ ("%q"):format(("Confirm task deletion?"):tr()) }}))
+		if (!confirm("{{ ("Confirm task deletion?"):tr() }}"))
 			return false;
 		$.post("/ajax/task/delete.json", {id: id, "delete": "Delete"}, function (data) {
 			if ("ok" == data.result)
@@ -49,7 +49,7 @@
 		if ("ok" == data.result)
 		{
 			showTasksPage();
-			alert({{ ("%q"):format(("Options have been saved successfuly."):tr()) }});
+			alert("{{ ("Options have been saved successfuly."):tr() }}");
 			$("#optionsNewPassword").val("");
 			$("#optionsNewPassword2").val("");
 			$("#optionsPassword").val("");

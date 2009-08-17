@@ -143,8 +143,8 @@ return {
 		luv:assign{title=tostring(task);user=user;task=task;editTaskForm=f}
 		luv:display"task.html"
 	end)};
-	{"^/registration/?$"; function (urlConf)
-		local f = app.forms.Registration(luv:postData())
+	{"^/sign_up/?$"; function (urlConf)
+		local f = app.forms.SignUp(luv:postData())
 		if f:submitted() then
 			if f:valid() then
 				local user = auth.models.User()
@@ -153,13 +153,13 @@ return {
 					f:addErrors(user:errors())
 				else
 					app.models.Options:create{user=user}
-					f:addMsg(tr'Sign up complete. Now you can <a href="/">log in</a>.')
+					f:addMsg(('Sign up complete. Now you can <a href="/">log in</a>.'):tr())
 					f:values{}
 				end
 			end
 		end
-		luv:assign{title=tr"sign up";registrationForm=f}
-		luv:display "registration.html"
+		luv:assign{title="sign up";registrationForm=f}
+		luv:display"registration.html"
 	end};
 	{"^/ajax/task/filter%-list%.json$"; requireAuth(function (urlConf, user)
 		-- Filtering
