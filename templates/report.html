@@ -5,7 +5,7 @@
 	<meta http-equiv="content-type" content="text/html; charset=utf-8">
 	<meta name="author" content="Artyom Shein">
 
-	<title>{{ title or "" }} - {{ ("tasker"):tr():capitalize() }}</title>
+	<title>{{ title and title:tr():capitalize() or "" }} - {{ ("tasker"):tr():capitalize() }}</title>
 
 	<link rel="stylesheet" type="text/css" href="/css/blueprint/screen.css" media="screen, projection" />
 	<link rel="stylesheet" type="text/css" href="/css/blueprint/print.css" media="print" />

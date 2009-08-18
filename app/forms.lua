@@ -72,7 +72,7 @@ local SignUp = forms.Form:extend{
 		return res
 	end;
 	initModel = function (self, model)
-		model:setValues(self:values())
+		model:values(self:values())
 		model.passwordHash = model:encodePassword(self.password)
 		return self
 	end;
