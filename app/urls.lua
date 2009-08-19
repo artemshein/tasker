@@ -1,4 +1,3 @@
-local tr = tr
 local forms = require"luv.forms"
 local auth = require"luv.contrib.auth"
 local fields = require"luv.fields"
@@ -7,6 +6,7 @@ local Q = models.Q
 local app = {models=require"app.models";forms=require"app.forms"}
 local ws = require"luv.webservers"
 local json = require"luv.utils.json"
+local utils = require"luv.utils"
 
 luv:assign{
 	empty=table.empty;pairs=pairs;ipairs=ipairs;version=version;
@@ -99,12 +99,24 @@ return {
 		luv:display"_tasks.html"
 	end)};
 	{"/ajax/task/field%-set%.json"; requireAuth(function (urlConf, user)
-		local res = app.models.Task:ajaxHandler(luv:postData())
+		local post = luv:postData()
+		local res = app.models.Task:ajaxHandler(post)
 		if not res then
 			ws.Http404()
 		end
-		local post = luv:postData()
-		app.models.Log:logTaskEdit(app.models.Task:find(post.id), user)
+		local task = app.models.Task:find(post.id)
+		app.models.Log:logTaskEdit(task, user)
+		-- Email notification
+		if "status" == post.field and task:isDone() and user ~= task.createdBy then
+			local email = task.createdBy.email
+			utils.sendEmail(
+				"tasker.notifier@services037.vita.rsc.energia.ru",
+				email,
+				("tasker"):tr():capitalize()..": "..("%(title)s has been done."):tr() % {title=("%q"):format(tostring(task))},
+				("%(user)s marked the task %(title)s as completed."):tr() % {user=tostring(user);title=("%q"):format(tostring(task))},
+				mailServer
+			)
+		end
 		io.write(res)
 	end)};
 	{"/ajax/task/delete%.json"; requireAuth(function (urlConf, user)

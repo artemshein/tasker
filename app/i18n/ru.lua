@@ -1,6 +1,8 @@
 return {
 --
 ["%(month)s %(day)s"]="%(day)s %(month)s";
+["%(title)s has been done."]="%(title)s выполнено.";
+["%(user)s marked the task %(title)s as completed."]="%(user)s пометил задачу %(title)s как выполненную.";
 -- A
 action="действие";
 administrator="администратор";
