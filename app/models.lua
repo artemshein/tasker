@@ -9,12 +9,17 @@ local table = require"luv.table"
 
 module(...)
 
+local property = models.Model.property
+
 local Task = models.Model:extend{
 	__tag = .....".Task";
-	Meta = {labels={"task";"tasks"}};
+	__tostring = function (self) return tostring(self.title) end;
 	_ajaxUrl = "/ajax/task/field-set.json";
-	newStatuses = {"";"new";"новое";"новая";"новый"};
-	doneStatuses = {"done";"finished";"completed";"сделано";"сделан";"сделана";"готово";"готова";"готов";"завершено";"закончено";"закончена";"закончен";"выполнено";"выполнена"};
+	_newStatuses = {"";"new";"новое";"новая";"новый"};
+	newStatuses = property"table";
+	_doneStatuses = {"done";"finished";"completed";"сделано";"сделан";"сделана";"готово";"готова";"готов";"завершено";"закончено";"закончена";"закончен";"выполнено";"выполнена"};
+	doneStatuses = property"table";
+	Meta = {labels={"task";"tasks"}};
 	title = fields.Text{required=true;label="title";classes={"big"}};
 	description = fields.Text{maxLength=false;label="description"}:addClasses{"huge";"resizable"};
 	dateCreated = fields.Datetime{autoNow=true};
@@ -25,18 +30,17 @@ local Task = models.Model:extend{
 	important = fields.Boolean{label="priority task";defaultValue=false};
 	status = fields.Text{label="current state";defaultValue=("new"):tr()}:addClass"tiny";
 	isNew = function (self)
-		if not self.status or table.ifind(self.newStatuses, self.status:lower()) then
+		if not self.status or table.ifind(self:newStatuses(), self.status:lower()) then
 			return true
 		end
 		return false
 	end;
 	isDone = function (self)
-		if self.status and table.ifind(self.doneStatuses, self.status:lower()) then
+		if self.status and table.ifind(self:doneStatuses(), self.status:lower()) then
 			return true
 		end
 		return false
 	end;
-	__tostring = function (self) return tostring(self.title) end;
 }
 
 local Log = models.Model:extend{

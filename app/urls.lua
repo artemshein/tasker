@@ -85,14 +85,14 @@ return {
 		end
 		if tasksFilter.status then
 			if "new" == tasksFilter.status then
-				p:filter{status__in=app.models.Task.newStatuses}
+				p:filter{status__in=app.models.Task:newStatuses()}
 			elseif "inProgress" == tasksFilter.status then
-				p:exclude{status__in=app.models.Task.newStatuses}
-				p:exclude{status__in=app.models.Task.doneStatuses}
+				p:exclude{status__in=app.models.Task:newStatuses()}
+				p:exclude{status__in=app.models.Task:doneStatuses()}
 			elseif "notCompleted" == tasksFilter.status then
-				p:exclude{status__in=app.models.Task.doneStatuses}
+				p:exclude{status__in=app.models.Task:doneStatuses()}
 			elseif "completed" == tasksFilter.status then
-				p:filter{status__in=app.models.Task.doneStatuses}
+				p:filter{status__in=app.models.Task:doneStatuses()}
 			end
 		end
 		luv:assign{user=user;p=p;page=page;tasks=p:page(page)}
@@ -250,11 +250,22 @@ return {
 		luv:display"main.html"
 	end)};
 	{"^/report/?$"; requireAuth(function (urlConf, user)
-		local tasks = app.models.Task:all():order"dateCreated":value()
-		local beginDate = os.date("*t", tasks[1].dateCreated)
+		local f = app.forms.Report(luv:postData())
+		if not f:submitted() or not f:valid() then
+			ws.Http403()
+		end
+		local tasks = app.models.Task:all():order"dateCreated"
+		if 1 == f.activeOnly then
+			tasks = tasks:exclude{status__in=app.models.Task:doneStatuses()}
+		end
+		if 1 == f.self then
+			tasks = tasks:filter(Q{assignedTo=user}-Q{createdBy=user})
+		end
+		tasks = tasks:value()
+		local beginDate = os.date("*t", math.max(tasks[1].dateCreated, f.from))
 		beginDate.hour = 0 beginDate.min = 0 beginDate.sec = 0
 		beginDate = os.time(beginDate)
-		local endDate = os.date("*t", math.max(tasks[#tasks].dateCreated, os.time()))
+		local endDate = os.date("*t", math.max(tasks[#tasks].dateCreated, f.till and math.min(f.till, os.time()) or os.time()))
 		endDate.hour = 0 endDate.min = 0 endDate.sec = 0
 		endDate = os.time(endDate)
 		local daysTotal = math.ceil((endDate-beginDate)/(24*60*60))+1
