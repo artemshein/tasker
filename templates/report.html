@@ -36,7 +36,7 @@
 	{% if skipFirst > 0 then %}
 		<td colspan="{{ skipFirst }}"></td>
 	{% end %}
-	<td colspan="{{ daysTotal-skipFirst }}" {% if task:isDone() then %}class="done"{% elseif task:isNew() then %}class="new"{% end %}>{{ task }} ({{ task.createdBy }}{% if task.assignedTo then %} &rarr; {{ task.assignedTo }}{% end %})</td>
+	<td colspan="{{ daysTotal-skipFirst }}" {% if task:isDone() then %}class="done"{% elseif task.important then %}class="important"{% elseif task:isNew() then %}class="new"{% else %}class="inProgress"{% end %}><strong>{{ task }}</strong> ({{ task.createdBy }}{% if task.assignedTo then %} &rarr; {{ task.assignedTo }}{% end %})</td>
 </tr>
 {% end %}
 </tbody></table>

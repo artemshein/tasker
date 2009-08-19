@@ -18,7 +18,7 @@ end):catch(function (e)
 	os.exit()
 end)]]
 
-version = utils.Version(0, 4, 3, "alpha")
+version = utils.Version(0, 4, 4, "alpha")
 
 try(function ()
 

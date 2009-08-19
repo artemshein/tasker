@@ -38,12 +38,14 @@ div.pages a{margin-left:10px;text-decoration:none}
 #tasks table td img,#logs table td img{vertical-align:middle}
 #logs table td{padding:8px}
 #tasks table tr.important td{background-color:#FDD !important}
-#tasks table tr.new td{background-color:#DFD !important}
-#tasks table tr.done td{background-color:#DDD !important}
+#tasks table tr.new td{background-color:#DFD}
+#tasks table tr.done td{background-color:#DDD}
 #tasks table thead tr td,#logs table thead tr td{font-weight:bold;background-color:#DDF;padding:8px;text-align:center}
 
 #report{width:auto;border-collapse:collapse}
-#report td, #report th{border:solid 1px #CCC;background-color:#FFD}
+#report td, #report th{border:solid 1px #CCC;background-color:#EFEFEF}
+#report td.important{background-color:#FDD}
 #report th{background-color:#DDF;font-weight:bold}
+#report td.inProgress{background-color:#FFF}
 #report td.done{background-color:#DDD}
 #report td.new{background-color:#DFD}

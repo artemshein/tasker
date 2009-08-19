@@ -58,6 +58,10 @@
 		else
 			showErrors(data.errors);
 	}
+	function onTaskImportantChange (self, field, value)
+	{
+		self.parents("tr").toggleClass("important");
+	}
 //]]></script>
 <div id="accordion">
 	<h1><a href="#">{{ ("new task"):tr():capitalize() }}</a></h1>
