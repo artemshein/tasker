@@ -261,14 +261,20 @@ return {
 		if 1 == f.self then
 			tasks = tasks:filter(Q{assignedTo=user}-Q{createdBy=user})
 		end
+		if f.till then
+			tasks = tasks:filter{dateCreated__lt=f.till+24*60*60}
+		end
 		tasks = tasks:value()
-		local beginDate = os.date("*t", f.from and math.max(tasks[1].dateCreated, f.from) or tasks[1].dateCreated)
-		beginDate.hour = 0 beginDate.min = 0 beginDate.sec = 0
-		beginDate = os.time(beginDate)
-		local endDate = os.date("*t", math.max(tasks[#tasks].dateCreated, f.till and math.min(f.till, os.time()) or os.time()))
-		endDate.hour = 0 endDate.min = 0 endDate.sec = 0
-		endDate = os.time(endDate)
-		local daysTotal = math.ceil((endDate-beginDate)/(24*60*60))+1
+		local beginDate, endDate, daysTotal
+		if not table.empty(tasks) then
+			beginDate = os.date("*t", f.from and math.max(tasks[1].dateCreated, f.from) or tasks[1].dateCreated)
+			beginDate.hour = 0 beginDate.min = 0 beginDate.sec = 0
+			beginDate = os.time(beginDate)
+			endDate = os.date("*t", f.till and math.min(f.till, math.max(tasks[#tasks].dateCreated, os.time())) or math.max(tasks[#tasks].dateCreated, os.time()))
+			endDate.hour = 0 endDate.min = 0 endDate.sec = 0
+			endDate = os.time(endDate)
+			daysTotal = math.ceil((endDate-beginDate)/(24*60*60))+1
+		end
 		luv:assign{
 			math=math;
 			user=user;users=auth.models.User:all():value();tasks=tasks;

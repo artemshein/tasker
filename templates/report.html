@@ -18,28 +18,32 @@
 
 <body>
 
-<table id="report"><thead>
-<tr><th>{{ ("tasks"):tr():capitalize() }} / {{ ("days"):tr() }}</th>
-{% local months = {"January";"February";"March";"April";"May";"June";"July";"August";"September";"October";"November";"December"} %}
-{% for i = 1, daysTotal do %}
-	{% local dt = date("*t", beginDate + (i-1)*24*60*60) %}
-	<th>{% if i == 1 or dt.day == 1 then %}{{ ("%(month)s %(day)s"):tr() % {month=months[dt.month]:tr();day=dt.day} }}{% else %}{{ dt.day }}{% end %}</td>
-{% end %}
-</th></thead>
-<tbody>
-{% for _, task in ipairs(tasks) do %}
-<tr>
-	<th>{{ task }}</th>
-	{%
-		local skipFirst = math.floor((task.dateCreated-beginDate)/(24*60*60))
-	%}
-	{% if skipFirst > 0 then %}
-		<td colspan="{{ skipFirst }}"></td>
+{% if not empty(tasks) then %}
+	<table id="report"><thead>
+	<tr><th>{{ ("tasks"):tr():capitalize() }} / {{ ("days"):tr() }}</th>
+	{% local months = {"January";"February";"March";"April";"May";"June";"July";"August";"September";"October";"November";"December"} %}
+	{% for i = 1, daysTotal do %}
+		{% local dt = date("*t", beginDate + (i-1)*24*60*60) %}
+		<th>{% if i == 1 or dt.day == 1 then %}{{ ("%(month)s %(day)s"):tr() % {month=months[dt.month]:tr();day=dt.day} }}{% else %}{{ dt.day }}{% end %}</td>
 	{% end %}
-	<td colspan="{{ daysTotal-skipFirst }}" {% if task:isDone() then %}class="done"{% elseif task.important then %}class="important"{% elseif task:isNew() then %}class="new"{% else %}class="inProgress"{% end %}><strong>{{ task }}</strong> ({{ task.createdBy }}{% if task.assignedTo then %} &rarr; {{ task.assignedTo }}{% end %})</td>
-</tr>
+	</th></thead>
+	<tbody>
+	{% for _, task in ipairs(tasks) do %}
+	<tr>
+		<th>{{ task }}</th>
+		{%
+			local skipFirst = math.floor((task.dateCreated-beginDate)/(24*60*60))
+		%}
+		{% if skipFirst > 0 then %}
+			<td colspan="{{ skipFirst }}"></td>
+		{% end %}
+		<td colspan="{{ daysTotal-skipFirst }}" {% if task:isDone() then %}class="done"{% elseif task.important then %}class="important"{% elseif task:isNew() then %}class="new"{% else %}class="inProgress"{% end %}><strong>{{ task }}</strong> ({{ task.createdBy }}{% if task.assignedTo then %} &rarr; {{ task.assignedTo }}{% end %})</td>
+	</tr>
+	{% end %}
+	</tbody></table>
+{% else %}
+	{{ ("No tasks satisfying the request."):tr() }}
 {% end %}
-</tbody></table>
 
 {{ safe(debugger) }}
 </body>
