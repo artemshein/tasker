@@ -262,7 +262,7 @@ return {
 			tasks = tasks:filter(Q{assignedTo=user}-Q{createdBy=user})
 		end
 		tasks = tasks:value()
-		local beginDate = os.date("*t", math.max(tasks[1].dateCreated, f.from))
+		local beginDate = os.date("*t", f.from and math.max(tasks[1].dateCreated, f.from) or tasks[1].dateCreated)
 		beginDate.hour = 0 beginDate.min = 0 beginDate.sec = 0
 		beginDate = os.time(beginDate)
 		local endDate = os.date("*t", math.max(tasks[#tasks].dateCreated, f.till and math.min(f.till, os.time()) or os.time()))
