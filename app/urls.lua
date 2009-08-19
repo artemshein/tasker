@@ -107,15 +107,25 @@ return {
 		local task = app.models.Task:find(post.id)
 		app.models.Log:logTaskEdit(task, user)
 		-- Email notification
-		if "status" == post.field and task:isDone() and user ~= task.createdBy then
-			local email = task.createdBy.email
-			utils.sendEmail(
-				"tasker.notifier@services037.vita.rsc.energia.ru",
-				email,
-				("tasker"):tr():capitalize()..": "..("%(title)s has been done."):tr() % {title=("%q"):format(tostring(task))},
-				("%(user)s marked the task %(title)s as completed."):tr() % {user=tostring(user);title=("%q"):format(tostring(task))},
-				mailServer
-			)
+		if "status" == post.field then
+			if task:isDone() and user ~= task.createdBy and task.createdBy.email then
+				utils.sendEmail(
+					mailFrom,
+					task.createdBy.email,
+					("tasker"):tr():capitalize()..": "..("the task %(task)s has been done."):tr() % {task=("%q"):format(tostring(task))},
+					("%(user)s marked the task %(task)s as completed."):tr() % {user=tostring(user);task=("%q"):format(tostring(task))},
+					mailServer
+				)
+			end
+			if not task:isDone() and task.assignedTo and user ~= task.assignedTo and task.assignedTo.email then
+				utils.sendEmail(
+					mailFrom,
+					task.assignedTo.email,
+					("tasker"):tr():capitalize()..": "..("the task %(task)s status changed."):tr() % {task=("%q"):format(tostring(task))},
+					("%(user)s changed the task %(task)s status to %(status)s."):tr() % {user=tostring(user);task=("%q"):format(tostring(task));status=("%q"):format(post.value)},
+					mailServer
+				)
+			end
 		end
 		io.write(res)
 	end)};

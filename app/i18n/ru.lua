@@ -1,8 +1,10 @@
 return {
 --
 ["%(month)s %(day)s"]="%(day)s %(month)s";
-["%(title)s has been done."]="%(title)s выполнено.";
-["%(user)s marked the task %(title)s as completed."]="%(user)s пометил задачу %(title)s как выполненную.";
+["the task %(task)s has been done."]="задача %(task)s выполнена.";
+["%(user)s marked the task %(task)s as completed."]="%(user)s пометил задачу %(task)s как выполненную.";
+["the task %(task)s status changed."]="изменился статус у задачи %(task)s.";
+["%(user)s changed the task %(task)s status to %(status)s."]="%(user)s изменил статус задачи %(task)s на %(status)s.";
 -- A
 action="действие";
 administrator="администратор";

@@ -9,16 +9,7 @@ local Exception, try = exceptions.Exception, exceptions.try
 local ws = require"luv.webservers"
 local utils, html = require"luv.utils", require"luv.utils.html"
 
---[[local auth, utils, html, fs
-
-try(function ()
-	
-end):catch(function (e)
-	io.write ("Content-type: text/html\n\n<pre>"..tostring(e))
-	os.exit()
-end)]]
-
-version = utils.Version(0, 4, 4, "alpha")
+version = utils.Version(0, 4, 5, "alpha")
 
 try(function ()
 
@@ -28,6 +19,8 @@ try(function ()
 	local baseDir = fs.Dir(arg[0]:slice(1, arg[0]:findLast"/" or arg[0]:findLast"\\"))
 	
 	dofile"config.lua"
+	
+	mailServer = mailServer or "localhost"
 	
 	local cgi = ws.Cgi(tmpDir)
 	-- Create Luv Core object with
