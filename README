@@ -9,6 +9,8 @@ Features
 * Almost total AJAX interface.
 * Log of changes.
 * Powerful filters.
+* Email notifications.
+* Reports.
 
 How to install
 --------------
@@ -22,6 +24,10 @@ sessionsDir = "/var/www/sessions"
 dsn = "mysql://tasker:passTasker@localhost/tasker"
 -- unique salt for passwords (keep it secret)
 secretSalt = "asd*#35&5sfds#!a*&@fknd^f8572@2rg6#2,ei||32fbDHWQ&*$^"
+-- [optional, default is localhost] mail server host
+mailServer = "mail.gmail.com"
+-- email notifier "From" field
+mailFrom = "tasker.notifier@example.com"
 ------------------------------------------------------------------------
 2. Give rights on write to tmpDir & sessionsDir.
 3. Uncomment and edit the reinstall section in app/urls.lua (change
