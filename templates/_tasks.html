@@ -11,7 +11,9 @@
 		{% end %}
 	>
 		<td>{{ task:field"important":asAjax"onTaskImportantChange":safe() }}</td>
-		<td style="white-space:nowrap"><a href="/task/{{ task.pk }}"><img src="/images/help_16.png" width="16" height="16" alt="{{ ("detalied info"):tr():capitalize() }}" title="{{ ("detalied info"):tr():capitalize() }}" /></a>{{ task:field"title":asAjax():safe() }}{% if task.createdBy == user then %} <a href="javascript:void(0)" onclick="deleteTask({{task.pk}});"><img src="/images/remove_16.png" width="16" height="16" title="{{ ("delete task"):tr():capitalize() }}" alt="{{ ("delete task"):tr():capitalize() }}" /></a>{% end %}</td>
+		<td style="white-space:nowrap">
+			<a href="/task/{{ task.pk }}"><img src="/images/help_16.png" width="16" height="16" alt="{{ ("detalied info"):tr():capitalize() }}" title="{{ ("detalied info"):tr():capitalize() }}" /></a>{{ task:field"title":asAjax():safe() }}{% if task.createdBy == user then %}<a href="javascript:void(0)" onclick="deleteTask({{task.pk}});"><img src="/images/remove_16.png" width="16" height="16" title="{{ ("delete task"):tr():capitalize() }}" alt="{{ ("delete task"):tr():capitalize() }}" /></a>{% end %}
+		</td>
 		<td>{{ task:field"status":asAjax():safe() }}</td>
 		<td>{{ task:field"assignedTo":asAjax():safe() }}</td>
 		<td style="white-space:nowrap">{{ task:field"timeToBeDone":asAjax():safe() }}{{ task:field"dateToBeDone":asAjax():safe() }}</td>

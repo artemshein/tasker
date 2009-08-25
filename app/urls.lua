@@ -15,7 +15,7 @@ luv:assign{
 
 local function authUser (urlConf)
 	local user = auth.models.User:authUser(luv:session())
-	if not user or not user.isActive then luv:responseHeader("Location", urlConf:baseUri().."/login"):sendHeaders() end
+	if not user or not user.isActive then luv:responseHeader("Location", urlConf:baseUri().."/sign_in"):sendHeaders() end
 	return user
 end
 
@@ -38,7 +38,7 @@ return {
 		luv:displayString "{{ safe(debugger) }}OK"
 	end};]]
 	{"^/admin"; require"luv.contrib.admin".AdminSite(luv, require"luv.contrib.auth".modelsAdmins(), app.models.admin):urls()};
-	{"^/login/?$"; function (urlConf)
+	{"^/sign_in/?$"; function (urlConf)
 		local loginForm = auth.forms.Login(luv:postData())
 		local user = auth.models.User:authUser(luv:session(), loginForm)
 		if user and user.isActive then
@@ -47,7 +47,7 @@ return {
 		luv:assign{title="authorisation";loginForm=loginForm}
 		luv:display"login.html"
 	end};
-	{"^/logout/?$"; requireAuth(function (urlConf, user)
+	{"^/sign_out/?$"; requireAuth(function (urlConf, user)
 		user:logout(luv:session())
 		luv:responseHeader("Location", "/"):sendHeaders()
 	end)};
@@ -175,7 +175,7 @@ return {
 					f:addErrors(user:errors())
 				else
 					app.models.Options:create{user=user}
-					f:addMsg(('Sign up complete. Now you can <a href="/">log in</a>.'):tr())
+					f:addMsg(('Sign up complete. Now you can <a href="/">sign in</a>.'):tr())
 					f:values{}
 				end
 			end

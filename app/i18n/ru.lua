@@ -45,6 +45,7 @@ filter="отфильтровать";
 ["from date"]="начиная с даты";
 ["full name"]="полное имя";
 ["full report"]="полный отчет";
+["Fill in only if you want to change password."]="Заполните только если хотите сменить пароль.";
 -- H
 help="помощь";
 -- J
@@ -71,10 +72,12 @@ new="новая";
 ["new task"]="новая задача";
 ["not completed"]="не законченная";
 November="ноября";
+["No tasks satisfying the request."]="Нет задач удовлетворяющих запросу.";
 -- O
 October="октября";
 ["only that for me"]="только то, что касается меня";
 ["old password"]="старый пароль";
+["only active tasks"]="только активные задачи";
 -- P
 pages="страницы";
 password="пароль";
@@ -91,7 +94,9 @@ reports="отчеты";
 save="сохранить";
 September="сентября";
 status="статус";
+["sign out"]="выйти";
 ["sign up"]="регистрация";
+['Sign up complete. Now you can <a href="/">sign in</a>.']='Регистрация завершена. Теперь вы можете <a href="/">войти</a>.';
 -- T
 task="задача";
 tasks="задачи";

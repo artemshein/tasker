@@ -5,7 +5,7 @@
 	function onTaskSave (data)
 	{
 		if ("ok" == data.result)
-			alert({{ ("%q"):format(("Task updated successfully."):tr()) }});
+			alert("{{ ("Task updated successfully."):tr() }}");
 		else
 			showErrors(data.errors);
 	}
