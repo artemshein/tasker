@@ -68,4 +68,13 @@ local Options = models.Model:extend{
 	tasksPerPage = fields.Int{label="tasks per page";defaultValue=10;required=true;choices={{10;10};{20;20};{30;30};{40;40};{50;50}}};
 }
 
+local Notification = models.Model:extend{
+	__tag = .....".Notification";
+	Meta = {labels={"notification";"notifications"}};
+	to = references.ManyToOne{references=auth.models.User;required=true};
+	dateCreated = fields.Datetime{autoNow=true};
+	dateSended = fields.Datetime();
+	text = fields.Text{required=true};
+}
+
 return {Task=Task;Log=Log;Options=Options;admin={Task;Log}}
