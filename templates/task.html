@@ -15,7 +15,7 @@
 <h1><a href="#">{{ ("task"):tr():capitalize() }} "{{ task }}"</a></h1>
 <div>
 	{% if editTaskForm:submitted() and not editTaskForm:valid() then %}
-		{{ include("_msgs-and-errors.html", {form=editTaskForm}) }}
+		{{ include("_msgs_and_errors.html", {form=editTaskForm}) }}
 	{% end %}
 	{{ safe(editTaskForm) }}
 </div>

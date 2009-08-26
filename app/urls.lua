@@ -25,7 +25,32 @@ local function requireAuth (func)
 	end 
 end
 
+local ok = function () luv:displayString"{{ safe(debugger) }}OK" end
+local migrationsLogger = function (text) io.write(text, "<br />") end
+
 return {
+	{"^/migrations/sd5sag3gj6"; {
+		{"^/reinstall"; function ()
+			local migrations = require"luv.contrib.migrations"
+			models.dropModels(migrations.models)
+			models.createModels(migrations.models)
+			ok()
+		end};
+		{"^/allUp$"; function ()
+			local migrations = require"luv.contrib.migrations"
+			local manager = migrations.MigrationManager(luv:db(), "app/migrations");
+			manager:logger(migrationsLogger)
+			manager:allUp()
+			ok()
+		end};
+		{"^/allDown$"; function ()
+			local migrations = require"luv.contrib.migrations"
+			local manager = migrations.MigrationManager(luv:db(), "app/migrations");
+			manager:logger(migrationsLogger)
+			manager:allDown()
+			ok()
+		end};
+	}};
 	{"^/test/?$"; function ()
 		io.write"<pre>"
 		require"luv.tests".all:run()
@@ -45,7 +70,7 @@ return {
 			luv:responseHeader("Location", "/"):sendHeaders()
 		end
 		luv:assign{title="authorisation";loginForm=loginForm}
-		luv:display"login.html"
+		luv:display"sign_in.html"
 	end};
 	{"^/sign_out/?$"; requireAuth(function (urlConf, user)
 		user:logout(luv:session())
@@ -106,25 +131,13 @@ return {
 		end
 		local task = app.models.Task:find(post.id)
 		app.models.Log:logTaskEdit(task, user)
-		-- Email notification
+		-- Notifications
 		if "status" == post.field then
-			if task:isDone() and user ~= task.createdBy and task.createdBy.email then
-				utils.sendEmail(
-					mailFrom,
-					task.createdBy.email,
-					("tasker"):tr():capitalize()..": "..("the task %(task)s has been done."):tr() % {task=("%q"):format(tostring(task))},
-					("%(user)s marked the task %(task)s as completed."):tr() % {user=tostring(user);task=("%q"):format(tostring(task))},
-					mailServer
-				)
+			if task:isDone() and user ~= task.createdBy then
+				app.models.Notification:create{to=task.createdBy;text=("%(user)s marked the task %(task)s as completed."):tr() % {user=tostring(user);task=("%q"):format(tostring(task))}}
 			end
-			if not task:isDone() and task.assignedTo and user ~= task.assignedTo and task.assignedTo.email then
-				utils.sendEmail(
-					mailFrom,
-					task.assignedTo.email,
-					("tasker"):tr():capitalize()..": "..("the task %(task)s status changed."):tr() % {task=("%q"):format(tostring(task))},
-					("%(user)s changed the task %(task)s status to %(status)s."):tr() % {user=tostring(user);task=("%q"):format(tostring(task));status=("%q"):format(post.value)},
-					mailServer
-				)
+			if not task:isDone() and task.assignedTo and user ~= task.assignedTo then
+				app.models.Notification:create{to=task.assignedTo;text=("%(user)s changed the task %(task)s status to %(status)s."):tr() % {user=tostring(user);task=("%q"):format(tostring(task));status=("%q"):format(post.value)}}
 			end
 		end
 		io.write(res)
