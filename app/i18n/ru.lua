@@ -43,6 +43,7 @@ February="февраля";
 filter="отфильтровать";
 ["forgot password"]="забыл пароль";
 ["from date"]="начиная с даты";
+["frequency of notifications"]="частота оповещений";
 ["full name"]="полное имя";
 ["full report"]="полный отчет";
 ["Fill in only if you want to change password."]="Заполните только если хотите сменить пароль.";
@@ -74,10 +75,14 @@ new="новая";
 November="ноября";
 ["No tasks satisfying the request."]="Нет задач удовлетворяющих запросу.";
 -- O
-October="октября";
 ["only that for me"]="только то, что касается меня";
 ["old password"]="старый пароль";
+["once a day"]="раз в день";
+["once a week"]="раз в неделю";
+["once an hour"]="раз в час";
 ["only active tasks"]="только активные задачи";
+October="октября";
+["Options have been saved successfuly."]="Опции были успешно сохранены.";
 -- P
 pages="страницы";
 password="пароль";

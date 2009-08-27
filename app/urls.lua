@@ -242,20 +242,21 @@ return {
 	end)};
 	{"^/ajax/save%-options%.json"; requireAuth(function (urlConf, user)
 		local f = app.forms.Options(luv:postData())
-		f:processAjaxForm(function (f)
+		local res = f:processAjaxForm(function (f)
 			if not user:comparePassword(f.password) then
-				f:addError(tr"Wrong password.")
+				f:addError(("Wrong password."):tr())
 				return false
 			end
 			if "" ~= f.newPassword then
 				if f.newPassword ~= f.newPassword2 then
-					f:addError(tr"Passwords don't match.")
+					f:addError(("Passwords don't match."):tr())
 					return false
 				else
 					user.passwordHash = auth.models.User:encodePassword(f.newPassword)
 				end
 			end
 			user.name = f.fullName
+			user.email = f.email
 			if not user:save() then
 				f:addErrors(user:errors())
 				return false
@@ -267,6 +268,9 @@ return {
 				return false
 			end
 		end)
+		if not res then
+			ws.Http403()
+		end
 	end)};
 	{"^/?$"; requireAuth(function (urlConf, user)
 		local createTaskForm = app.forms.CreateTask()
