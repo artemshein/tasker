@@ -25,6 +25,14 @@ local function requireAuth (func)
 	end 
 end
 
+local function ajaxForm (form, func)
+	return requireAuth(function (urlConf, user)
+		if not form(luv:postData()):processAjaxForm(func) then
+			ws.Http403()
+		end
+	end)
+end
+
 local ok = function () luv:displayString"{{ safe(debugger) }}OK" end
 local migrationsLogger = function (text) io.write(text, "<br />") end
 
@@ -124,37 +132,60 @@ return {
 		luv:display"_tasks.html"
 	end)};
 	{"/ajax/task/field%-set%.json"; requireAuth(function (urlConf, user)
-		local post = luv:postData()
-		local res = app.models.Task:ajaxHandler(post)
+		local res = app.models.Task:ajaxFieldHandler(luv:postData(), function (f, task)
+			local res = task.createdBy == user or task.assignedTo == user
+			-- Notify old Executor when Executor is changed
+			if "assignedTo" == f.field and task.assignedTo and f.value ~= task.assignedTo.pk and user ~= task.assignedTo then
+				app.models.Notification:create{
+					to=task.assignedTo;
+					text=("%(user)s changed the task %(task)s field %(field)s value to %(value)s."):tr() % {
+						user=tostring(user);
+						task=("%q"):format(tostring(task));
+						field=("%q"):format(f.field);
+						value=("%q"):format(f.value);
+					};
+				}
+			end
+			return res
+		end, function (f, task)
+			app.models.Log:logTaskEdit(task, user)
+			-- Notify Executor when Owner changes the task
+			if task.assignedTo and task.assignedTo ~= user then
+				app.models.Notification:create{
+					to=task.assignedTo;
+					text=("%(user)s changed the task %(task)s field %(field)s value to %(value)s."):tr() % {
+						user=tostring(user);
+						task=("%q"):format(tostring(task));
+						field=("%q"):format(f.field);
+						value=("%q"):format(f.value);
+					};
+				}
+			end
+			-- Notify Owner when Executor finishes the task
+			if "status" == f.field and task:isDone() and user ~= task.createdBy then
+				app.models.Notification:create{
+					to=task.createdBy;
+					text=("%(user)s marked the task %(task)s as completed."):tr() % {user=tostring(user);task=("%q"):format(tostring(task))};
+				}
+			end
+		end)
 		if not res then
-			ws.Http404()
+			ws.Http403()
 		end
-		local task = app.models.Task:find(post.id)
-		app.models.Log:logTaskEdit(task, user)
-		-- Notifications
-		if "status" == post.field then
-			if task:isDone() and user ~= task.createdBy then
-				app.models.Notification:create{to=task.createdBy;text=("%(user)s marked the task %(task)s as completed."):tr() % {user=tostring(user);task=("%q"):format(tostring(task))}}
-			end
-			if not task:isDone() and task.assignedTo and user ~= task.assignedTo then
-				app.models.Notification:create{to=task.assignedTo;text=("%(user)s changed the task %(task)s status to %(status)s."):tr() % {user=tostring(user);task=("%q"):format(tostring(task));status=("%q"):format(post.value)}}
-			end
-		end
-		io.write(res)
 	end)};
-	{"/ajax/task/delete%.json"; requireAuth(function (urlConf, user)
-		local f = app.forms.DeleteTask(luv:postData())
-		if f:submitted() then
-			if f:valid() then
-				local task = app.models.Task:find(f.id)
-				if task and task.createdBy == user then
-					task:delete()
-					app.models.Log:logTaskDelete(task, user)
-					io.write(json.serialize{result="ok"})
-				end
-			else
-				io.write(json.serialize{result="error";errors=f:errors()})
+	{"/ajax/task/delete%.json"; ajaxForm(app.forms.DeleteTask, function (f)
+		local task = app.models.Task:find(f.id)
+		if task and task.createdBy == user then
+			if task.assignedTo ~= user then
+				app.models.Notification:create{
+					to=task.assignedTo;
+					text=("Task %(task)s has been deleted."):tr() % {task=("%q"):format(tostring(task))};
+				}
 			end
+			task:delete()
+			app.models.Log:logTaskDelete(task, user)
+		else
+			return false
 		end
 	end)};
 	{"^/ajax/task/(%d+)/save.json"; requireAuth(function (urlConf, user, taskId)
@@ -196,80 +227,49 @@ return {
 		luv:assign{title="sign up";registrationForm=f}
 		luv:display"registration.html"
 	end};
-	{"^/ajax/task/filter%-list%.json$"; requireAuth(function (urlConf, user)
-		-- Filtering
-		local f = app.forms.TasksFilter(luv:postData())
-		if f:submitted() then
-			if f:valid() then
-				f:initModel(luv:session())
-				luv:session():save()
-				io.write(json.serialize{result="ok"})
-			else
-				io.write(json.serialize{result="error";errors=f:errors()})
-			end
-		else
-			ws.Http404()
-		end
+	{"^/ajax/task/filter%-list%.json$"; ajaxForm(app.forms.TasksFilter, function (f)
+		f:initModel(luv:session())
+		luv:session():save()
 	end)};
-	{"^/ajax/log/filter%-list%.json$"; requireAuth(function (urlConf, user)
-		-- Filtering
-		local f = app.forms.LogsFilter(luv:postData())
-		if f:submitted() then
-			if f:valid() then
-				f:initModel(luv:session())
-				luv:session():save()
-				io.write(json.serialize{result="ok"})
-			else
-				io.write(json.serialize{result="error";errors=f:errors()})
-			end
-		else
-			ws.Http404()
-		end
+	{"^/ajax/log/filter%-list%.json$"; ajaxForm(app.forms.LogsFilter, function (f)
+		f:initModel(luv:session())
+		luv:session():save()
 	end)};
 	{"^/help/?$"; function ()
 		luv:assign{title="Помощь"}
 		luv:display"help.html"
 	end};
-	{"^/ajax/task/create%.json$"; requireAuth(function (urlConf, user)
-		local f = app.forms.CreateTask(luv:postData())
-		f:processAjaxForm(function (f)
-			local task = app.models.Task()
-			f:initModel(task)
-			task.createdBy = user
-			task:insert()
-			app.models.Log:logTaskCreate(task, user)
-		end)
+	{"^/ajax/task/create%.json$"; ajaxForm(app.forms.CreateTask, function (f)
+		local task = app.models.Task()
+		f:initModel(task)
+		task.createdBy = user
+		task:insert()
+		app.models.Log:logTaskCreate(task, user)
 	end)};
-	{"^/ajax/save%-options%.json"; requireAuth(function (urlConf, user)
-		local f = app.forms.Options(luv:postData())
-		local res = f:processAjaxForm(function (f)
-			if not user:comparePassword(f.password) then
-				f:addError(("Wrong password."):tr())
+	{"^/ajax/save%-options%.json"; ajaxForm(app.forms.Options, function (f)
+		if not user:comparePassword(f.password) then
+			f:addError(("Wrong password."):tr())
+			return false
+		end
+		if "" ~= f.newPassword then
+			if f.newPassword ~= f.newPassword2 then
+				f:addError(("Passwords don't match."):tr())
 				return false
+			else
+				user.passwordHash = auth.models.User:encodePassword(f.newPassword)
 			end
-			if "" ~= f.newPassword then
-				if f.newPassword ~= f.newPassword2 then
-					f:addError(("Passwords don't match."):tr())
-					return false
-				else
-					user.passwordHash = auth.models.User:encodePassword(f.newPassword)
-				end
-			end
-			user.name = f.fullName
-			user.email = f.email
-			if not user:save() then
-				f:addErrors(user:errors())
-				return false
-			end
-			local options = user.options or app.models.Options()
-			f:initModel(options)
-			if not options:save() then
-				f:addErrors(options:errors())
-				return false
-			end
-		end)
-		if not res then
-			ws.Http403()
+		end
+		user.name = f.fullName
+		user.email = f.email
+		if not user:save() then
+			f:addErrors(user:errors())
+			return false
+		end
+		local options = user.options or app.models.Options()
+		f:initModel(options)
+		if not options:save() then
+			f:addErrors(options:errors())
+			return false
 		end
 	end)};
 	{"^/?$"; requireAuth(function (urlConf, user)

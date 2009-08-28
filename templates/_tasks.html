@@ -10,13 +10,23 @@
 			class="{% if task:isDone() then %}done{% end %}{% if task.important == 1 then %} important{% end %}{% if task:isNew() then %} new{% end %}"
 		{% end %}
 	>
-		<td>{{ task:field"important":asAjax"onTaskImportantChange":safe() }}</td>
-		<td style="white-space:nowrap">
-			<a href="/task/{{ task.pk }}"><img src="/images/help_16.png" width="16" height="16" alt="{{ ("detalied info"):tr():capitalize() }}" title="{{ ("detalied info"):tr():capitalize() }}" /></a>{{ task:field"title":asAjax():safe() }}{% if task.createdBy == user then %}<a href="javascript:void(0)" onclick="deleteTask({{task.pk}});"><img src="/images/remove_16.png" width="16" height="16" title="{{ ("delete task"):tr():capitalize() }}" alt="{{ ("delete task"):tr():capitalize() }}" /></a>{% end %}
-		</td>
-		<td>{{ task:field"status":asAjax():safe() }}</td>
-		<td>{{ task:field"assignedTo":asAjax():safe() }}</td>
-		<td style="white-space:nowrap">{{ task:field"timeToBeDone":asAjax():safe() }}{{ task:field"dateToBeDone":asAjax():safe() }}</td>
+		{% if task.createdBy == user or task.assignedTo == user then %}
+			<td>{{ task:field"important":asAjax"onTaskImportantChange":safe() }}</td>
+			<td style="white-space:nowrap">
+				<a href="/task/{{ task.pk }}"><img src="/images/help_16.png" width="16" height="16" alt="{{ ("detalied info"):tr():capitalize() }}" title="{{ ("detalied info"):tr():capitalize() }}" /></a>{{ task:field"title":asInlineEditAjax():safe() }}{% if task.createdBy == user then %}<a href="javascript:void(0)" onclick="deleteTask({{task.pk}});"><img src="/images/remove_16.png" width="16" height="16" title="{{ ("delete task"):tr():capitalize() }}" alt="{{ ("delete task"):tr():capitalize() }}" /></a>{% end %}
+			</td>
+			<td>{{ task:field"status":asInlineEditAjax():safe() }}</td>
+			<td>{{ task:field"assignedTo":asInlineEditAjax():safe() }}</td>
+			<td style="white-space:nowrap">{{ task:field"timeToBeDone":asAjax():safe() }}{{ task:field"dateToBeDone":asAjax():safe() }}</td>
+		{% else %}
+			<td style="text-align:center;font-weight:bold">{% if task.important then %}!{% end %}</td>
+			<td>
+				<a href="/task/{{ task.pk }}"><img src="/images/help_16.png" width="16" height="16" alt="{{ ("detalied info"):tr():capitalize() }}" title="{{ ("detalied info"):tr():capitalize() }}" /></a> {{ task.title }}
+			</td>
+			<td>{{ task.status or "" }}</td>
+			<td>{{ task.assignedTo or "" }}</td>
+			<td style="white-space:nowrap">{{ task.timeToBeDone or "" }}{{ task.dateToBeDone or "" }}</td>
+		{% end %}
 		<td>{{ task.createdBy }}</td>
 	</tr>
 	{% end %}

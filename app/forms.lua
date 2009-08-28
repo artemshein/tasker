@@ -147,7 +147,7 @@ local Options = forms.ModelForm:extend{
 		id="options";
 		action="/ajax/save-options.json";
 		ajax='{success: onOptionsSave, dataType: "json"}';
-		fields={"fullName";"email";"tasksPerPage";"notifsFreq";"newPassword";"newPassword2";"password"};
+		fields={"fullName";"email";"tasksPerPage";"notifFreq";"newPassword";"newPassword2";"password"};
 	};
 	fullName = auth.models.User:field"name":clone():required(true):label"full name";
 	email = auth.models.User:field"email":clone():required(true);

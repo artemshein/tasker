@@ -4,7 +4,7 @@ return {
 ["the task %(task)s has been done."]="задача %(task)s выполнена.";
 ["%(user)s marked the task %(task)s as completed."]="%(user)s пометил задачу %(task)s как выполненную.";
 ["the task %(task)s status changed."]="изменился статус у задачи %(task)s.";
-["%(user)s changed the task %(task)s status to %(status)s."]="%(user)s изменил статус задачи %(task)s на %(status)s.";
+["%(user)s changed the task %(task)s field %(field)s value to %(value)s."]="%(user)s изменил значение поля %(field)s задачи %(task)s на %(value)s.";
 -- A
 action="действие";
 administrator="администратор";

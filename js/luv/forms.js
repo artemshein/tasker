@@ -23,8 +23,9 @@
 	};
 	jQuery.fn.ajaxField = function (url, id, field, callback)
 	{
+		var self = this;
+		this.addClass("ajax");
 		function commitChanges () {
-			var self = jQuery(this);
 			var currentValue = self.fieldRawVal();
 			if (currentValue != self.data("lastValue"))
 			{
@@ -37,7 +38,7 @@
 					else
 					{
 						self.data("lastValue", currentValue);
-						self.addClass("textValue").removeClass("error");
+						self.removeClass("error");
 						if (callback)
 							callback(self, field, currentValue);
 					}
@@ -47,20 +48,25 @@
 				}});
 			}
 			else
-				self.addClass("textValue").removeClass("error");
-		}
-		function showField ()
-		{
-			jQuery(this).removeClass("textValue");
+				self.removeClass("error");
 		}
 		this.data("lastValue", this.fieldRawVal());
 		if (this.is(":checkbox"))
 			this.change(commitChanges).change();
 		else if (this.hasClass("hasDatepicker"))
-			this.change(commitChanges).focus(showField).blur(function () { jQuery(this).addClass("textValue"); }).addClass("textValue");
+			this.change(commitChanges).addClass("ajax");
 		else
-			this.focus(showField).blur(commitChanges).blur();
+			this.blur(commitChanges).blur();
 		return this;
+	};
+	jQuery.fn.inlineEditAjaxField = function (url, id, field, callback)
+	{
+		var value = jQuery("#"+this.attr("id")+"Value");
+		this.ajaxField(url, id, field, callback);
+		value.text(this.fieldVal()).click(function () {
+				
+		});
+		this.hide();
 	};
 	jQuery.fn.hideError = function ()
 	{
