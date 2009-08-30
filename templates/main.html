@@ -60,7 +60,10 @@
 	}
 	function onTaskImportantChange (self, field, value)
 	{
-		self.parents("tr").toggleClass("important");
+		if (value)
+			self.parents("tr").addClass("important");
+		else
+			self.parents("tr").removeClass("important");
 	}
 //]]></script>
 <div id="accordion">

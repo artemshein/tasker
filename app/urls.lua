@@ -1,3 +1,4 @@
+local require = require
 local forms = require"luv.forms"
 local auth = require"luv.contrib.auth"
 local fields = require"luv.fields"
@@ -27,6 +28,7 @@ end
 
 local function ajaxForm (form, func)
 	return requireAuth(function (urlConf, user)
+		setfenv(func, {urlConf=urlConf;user=user})
 		if not form(luv:postData()):processAjaxForm(func) then
 			ws.Http403()
 		end

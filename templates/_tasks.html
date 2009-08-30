@@ -11,23 +11,23 @@
 		{% end %}
 	>
 		{% if task.createdBy == user or task.assignedTo == user then %}
-			<td>{{ task:field"important":asAjax"onTaskImportantChange":safe() }}</td>
+			<td style="text-align:center">{{ task:field"important":asAjax"onTaskImportantChange":safe() }}</td>
 			<td style="white-space:nowrap">
 				<a href="/task/{{ task.pk }}"><img src="/images/help_16.png" width="16" height="16" alt="{{ ("detalied info"):tr():capitalize() }}" title="{{ ("detalied info"):tr():capitalize() }}" /></a>{{ task:field"title":asInlineEditAjax():safe() }}{% if task.createdBy == user then %}<a href="javascript:void(0)" onclick="deleteTask({{task.pk}});"><img src="/images/remove_16.png" width="16" height="16" title="{{ ("delete task"):tr():capitalize() }}" alt="{{ ("delete task"):tr():capitalize() }}" /></a>{% end %}
 			</td>
-			<td>{{ task:field"status":asInlineEditAjax():safe() }}</td>
-			<td>{{ task:field"assignedTo":asInlineEditAjax():safe() }}</td>
-			<td style="white-space:nowrap">{{ task:field"timeToBeDone":asAjax():safe() }}{{ task:field"dateToBeDone":asAjax():safe() }}</td>
+			<td style="text-align:center">{{ task:field"status":asInlineEditAjax():safe() }}</td>
+			<td style="text-align:center">{{ task:field"assignedTo":asInlineEditAjax():safe() }}</td>
+			<td style="text-align:center;white-space:nowrap">{{ task:field"timeToBeDone":asInlineEditAjax():safe() }}{{ task:field"dateToBeDone":asInlineEditAjax():safe() }}</td>
 		{% else %}
 			<td style="text-align:center;font-weight:bold">{% if task.important then %}!{% end %}</td>
 			<td>
 				<a href="/task/{{ task.pk }}"><img src="/images/help_16.png" width="16" height="16" alt="{{ ("detalied info"):tr():capitalize() }}" title="{{ ("detalied info"):tr():capitalize() }}" /></a> {{ task.title }}
 			</td>
-			<td>{{ task.status or "" }}</td>
-			<td>{{ task.assignedTo or "" }}</td>
-			<td style="white-space:nowrap">{{ task.timeToBeDone or "" }}{{ task.dateToBeDone or "" }}</td>
+			<td style="text-align:center">{{ task.status or "" }}</td>
+			<td style="text-align:center">{{ task.assignedTo or "" }}</td>
+			<td style="text-align:center;white-space:nowrap">{{ task.timeToBeDone or "" }}{{ task.dateToBeDone or "" }}</td>
 		{% end %}
-		<td>{{ task.createdBy }}</td>
+		<td style="text-align:center">{{ task.createdBy }}</td>
 	</tr>
 	{% end %}
 	</tbody></table>

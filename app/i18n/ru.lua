@@ -73,6 +73,7 @@ new="новая";
 ["new task"]="новая задача";
 ["not completed"]="не законченная";
 November="ноября";
+["No records."]="Нет записей.";
 ["No tasks satisfying the request."]="Нет задач удовлетворяющих запросу.";
 -- O
 ["only that for me"]="только то, что касается меня";
@@ -109,11 +110,12 @@ tasker="задачник";
 ["tasks list"]="список задач";
 ["tasks per page"]="задач на странице";
 term="срок";
-["term (date)"]="сроки (дата)";
-["term (time)"]="сроки (время)";
+["term (date)"]="срок (дата)";
+["term (time)"]="срок (время)";
 ["ToDo list"]="ToDo-лист";
 title="название";
 ["till date"]="заканчивая датой";
+["Task has been created successfuly."]="Задача успешно создана.";
 ["Task updated successfully."]="Задача успешно обновлена.";
 -- U
 user="пользователь";

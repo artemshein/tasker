@@ -17,8 +17,10 @@ input.datetime{width:160px}
 input[type="text"].required, input[type="password"].required, textarea.required, select.required {background-color:#FFD}
 input[disabled], textarea[disabled], select[disabled]{background-color:#DDD !important;color:#999 !important}
 
-input.textValue, select.textValue, textarea.textValue{background:none !important;border:none !important;margin:3px 1px}
+.ajaxField{background:none !important;border:none !important;margin:3px 1px}
 input.error, select.error, textarea.error{background-color:#FDD !important;border:solid 1px #F00 !important;padding:2px;margin:2px 0}
+.inlineEditValue{margin:0 4px}
+.emptyInlineEditValue{white-space:pre-wrap}
 
 div.ui-accordion-content{padding:12px 16px !important}
 
@@ -34,7 +36,7 @@ div.pages a{margin-left:10px;text-decoration:none}
 #tasksFilter,#logsFilter{margin-bottom:4px}
 
 #tasks table,#logs table{border-collapse:collapse}
-#tasks table td,#logs table td{border:solid 1px #CCC;background-color:#FFF;padding:2px 6px}
+#tasks table td,#logs table td{border:solid 1px #CCC;background-color:#FFF;padding:4px 6px}
 #tasks table td img,#logs table td img{vertical-align:middle}
 #logs table td{padding:8px}
 #tasks table tr.important td{background-color:#FDD !important}

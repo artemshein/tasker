@@ -65,7 +65,7 @@ local Options = models.Model:extend{
 	__tag = .....".Options";
 	Meta = {labels={"options";"options"}};
 	user = references.OneToOne{references=auth.models.User;required=true};
-	tasksPerPage = fields.Int{label="tasks per page";defaultValue=10;required=true;choices={{10;10};{20;20};{30;30};{40;40};{50;50}}};
+	tasksPerPage = fields.Int{label="tasks per page";defaultValue=20;required=true;choices={{10;10};{20;20};{30;30};{40;40};{50;50}}};
 	notifFreq = fields.Int{label="frequency of notifications";defaultValue=24*60*60;required=true;choices={{60*60;("once an hour"):tr()};{24*60*60;("once a day"):tr()};{7*24*60*60;("once a week"):tr()}}};
 }
 
