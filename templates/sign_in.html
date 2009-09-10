@@ -3,7 +3,7 @@
 {[ section "content" ]}
 
 {% if loginForm:submitted() then %}
-	{{ include("_msgs-and-errors.html", {form=loginForm}) }}
+	{{ include("_msgs_and_errors.html", {form=loginForm}) }}
 {% end %}
 {{ safe(loginForm) }}
 
