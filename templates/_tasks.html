@@ -12,8 +12,8 @@
 	>
 		{% if task.createdBy == user or task.assignedTo == user then %}
 			<td>{{ task:field"important":asAjax"onTaskImportantChange":safe() }}</td>
-			<td style="white-space:nowrap">
-				<a href="/task/{{ task.pk }}"><img src="/images/help_16.png" width="16" height="16" alt="{{ ("detalied info"):tr():capitalize() }}" title="{{ ("detalied info"):tr():capitalize() }}" /></a>{{ task:field"title":asInlineEditAjax():safe() }}{% if task.createdBy == user then %}<a href="javascript:void(0)" onclick="deleteTask({{task.pk}});"><img src="/images/remove_16.png" width="16" height="16" title="{{ ("delete task"):tr():capitalize() }}" alt="{{ ("delete task"):tr():capitalize() }}" /></a>{% end %}
+			<td>
+				<a href="/task/{{ task.pk }}"><img src="/images/help_16.png" width="16" height="16" alt="{{ ("detalied info"):tr():capitalize() }}" title="{{ ("detalied info"):tr():capitalize() }}" /></a> {{ task:field"title":asInlineEditAjax():safe() }} {% if task.createdBy == user then %}<a href="javascript:void(0)" onclick="deleteTask({{task.pk}});"><img src="/images/remove_16.png" width="16" height="16" title="{{ ("delete task"):tr():capitalize() }}" alt="{{ ("delete task"):tr():capitalize() }}" /></a>{% end %}
 			</td>
 			<td>{{ task:field"status":asInlineEditAjax():safe() }}</td>
 			<td>{{ task:field"assignedTo":asInlineEditAjax():safe() }}</td>

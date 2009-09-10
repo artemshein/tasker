@@ -25,6 +25,8 @@ copyright="копирайт";
 completed="законченная";
 ["current password"]="текущий пароль";
 -- D
+["date created"]="дата создания";
+["date sended"]="дата отправления";
 December="декабря";
 ["date and time"]="дата и время";
 days="дни";
@@ -68,10 +70,12 @@ March="марта";
 May="мая";
 ["my actions only"]="только мои действия";
 -- N
+never="никогда";
 new="новая";
 ["new password"]="новый пароль";
 ["new task"]="новая задача";
 ["not completed"]="не законченная";
+notifications="оповещения";
 November="ноября";
 ["No tasks satisfying the request."]="Нет задач удовлетворяющих запросу.";
 -- O
@@ -111,6 +115,7 @@ tasker="задачник";
 term="срок";
 ["term (date)"]="сроки (дата)";
 ["term (time)"]="сроки (время)";
+text="текст";
 ["ToDo list"]="ToDo-лист";
 title="название";
 ["till date"]="заканчивая датой";

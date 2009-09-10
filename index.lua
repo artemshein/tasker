@@ -9,7 +9,7 @@ local Exception, try = exceptions.Exception, exceptions.try
 local ws = require"luv.webservers"
 local utils, html = require"luv.utils", require"luv.utils.html"
 
-version = utils.Version(0, 4, 6, "alpha")
+version = utils.Version(0, 5, 0, "alpha")
 
 try(function ()
 

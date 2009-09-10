@@ -6,18 +6,22 @@
 	{
 		if (value)
 			return this.val(value);
+		if (this.is(":checkbox"))
+			return this.attr("checked")? this.val() : null;
 		else
-		{
-			if (this.is(":checkbox"))
-				return this.attr("checked")? this.val() : null;
-			else
-				return this.val();
-		}
+			return this.val();
+	};
+	jQuery.fn.showErrors = function (errors)
+	{
+		this.addClass("error");
+		$.each(errors, function (i, error) { alert(error); });
 	};
 	jQuery.fn.fieldVal = function (value)
 	{
 		if (value)
 			return this.val(value);
+		if (this.is("select"))
+			return this.find("option:selected").text();
 		else
 			return this.val();
 	};
@@ -33,7 +37,9 @@
 				success: function (data, textStatus) {
 					if (data.status == "error")
 					{
-						jQuery.each(data.errors, function (error) { alert(error); });
+						self.showErrors(data.errors);
+						if (!self.fieldVal())
+							self.fieldVal(self.data("lastValue")).focus().select();
 					}
 					else
 					{
@@ -48,7 +54,11 @@
 				}});
 			}
 			else
+			{
 				self.removeClass("error");
+				if (callback)
+					callback(self, field, currentValue);
+			}
 		}
 		this.data("lastValue", this.fieldRawVal());
 		if (this.is(":checkbox"))
@@ -61,10 +71,29 @@
 	};
 	jQuery.fn.inlineEditAjaxField = function (url, id, field, callback)
 	{
-		var value = jQuery("#"+this.attr("id")+"Value");
-		this.ajaxField(url, id, field, callback);
-		value.text(this.fieldVal()).click(function () {
-				
+		function setValue (self, val)
+		{
+			self.text(val);
+			if (val)
+				self.removeClass("emptyInlineEditValue");
+			else
+				self.addClass("emptyInlineEditValue");
+		}
+		var value = jQuery("#"+this.attr("id")+"Value").addClass("inlineEditValue");
+		var self = this;
+		var newCallback = function (self, field, currentValue) {
+			if (!callback || callback(self, field, currentValue))
+			{
+				self.hide();
+				setValue(value, self.fieldVal());
+				value.show();
+			}
+		}
+		this.ajaxField(url, id, field, newCallback);
+		setValue(value, self.fieldVal());
+		value.click(function () {
+			value.hide();
+			self.show().focus().select();
 		});
 		this.hide();
 	};

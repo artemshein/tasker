@@ -21,7 +21,7 @@ local Task = models.Model:extend{
 	doneStatuses = property"table";
 	Meta = {labels={"task";"tasks"}};
 	title = fields.Text{required=true;label="title";classes={"big"}};
-	description = fields.Text{maxLength=false;label="description"}:addClasses{"huge";"resizable"};
+	description = fields.Text{maxLength=false;label="description"}:addClasses{"huge"};
 	dateCreated = fields.Datetime{autoNow=true};
 	createdBy = references.ManyToOne{references=auth.models.User;required=true;choices=auth.models.User:all()}:ajaxWidget(widgets.Select());
 	assignedTo = references.ManyToOne{references=auth.models.User;label="executor";choices=auth.models.User:all()}:ajaxWidget(widgets.Select());
@@ -66,7 +66,7 @@ local Options = models.Model:extend{
 	Meta = {labels={"options";"options"}};
 	user = references.OneToOne{references=auth.models.User;required=true};
 	tasksPerPage = fields.Int{label="tasks per page";defaultValue=10;required=true;choices={{10;10};{20;20};{30;30};{40;40};{50;50}}};
-	notifFreq = fields.Int{label="frequency of notifications";defaultValue=24*60*60;required=true;choices={{60*60;("once an hour"):tr()};{24*60*60;("once a day"):tr()};{7*24*60*60;("once a week"):tr()}}};
+	notifFreq = fields.Int{label="frequency of notifications";defaultValue=24*60*60;required=true;choices={{0;("never"):tr()};{60*60;("once an hour"):tr()};{24*60*60;("once a day"):tr()};{7*24*60*60;("once a week"):tr()}}};
 }
 
 local Notification = models.Model:extend{
