@@ -51,3 +51,5 @@ div.pages a{margin-left:10px;text-decoration:none}
 #report td.inProgress{background-color:#FFF}
 #report td.done{background-color:#DDD}
 #report td.new{background-color:#DFD}
+
+#taskDescription{white-space:pre-wrap}
