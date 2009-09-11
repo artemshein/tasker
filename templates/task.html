@@ -14,10 +14,17 @@
 <div id="accordion">
 <h1><a href="#">{{ ("task"):tr():capitalize() }} "{{ task }}"</a></h1>
 <div>
-	{% if editTaskForm:submitted() and not editTaskForm:valid() then %}
-		{{ include("_msgs_and_errors.html", {form=editTaskForm}) }}
+	{% if task.createdBy == user or task.assignedTo == user then %}
+		{% if editTaskForm:submitted() and not editTaskForm:valid() then %}
+			{{ include("_msgs_and_errors.html", {form=editTaskForm}) }}
+		{% end %}
+		{{ safe(editTaskForm) }}
+	{% else %}
+		<h2>{% if task.important then %}<strong>!</strong> {% end %}{{ task.title }} <small>({{ task.status }})</small></h2>
+		<div>{{ task.createdBy }}{% if task.assignedTo then %} &rarr; {{ task.assignedTo }}{% end %}</div>
+		{% if task.timeToBeDone or task.dateToBeDone then %}<div>{{ ("term"):tr():capitalize() }}: {{ task:field"timeToBeDone" }} {{ task:field"dateToBeDone" }}</div>{% end %}
+		{{ task.description or "" }}
 	{% end %}
-	{{ safe(editTaskForm) }}
 </div>
 </div>
 <script type="text/javascript" language="JavaScript">//<![CDATA[

@@ -29,7 +29,7 @@ local ok = function () luv:displayString"{{ safe(debugger) }}OK" end
 local migrationsLogger = function (text) io.write(text, "<br />") end
 
 return {
-	{"^/migrations/sd5sag3gj6"; {
+	--[[{"^/migrations/sd5sag3gj6"; {
 		{"^/reinstall"; function ()
 			local migrations = require"luv.contrib.migrations"
 			models.dropModels(migrations.models)
@@ -54,7 +54,7 @@ return {
 	{"^/test/?$"; function ()
 		io.write"<pre>"
 		require"luv.tests".all:run()
-	end};
+	end};]]
 	--[[{"^/reinstall/?$"; function ()
 		models.dropModels(models.Model.modelsList)
 		models.createModels(models.Model.modelsList)
@@ -62,7 +62,7 @@ return {
 		app.models.Options:create{user=temiy}
 		luv:displayString "{{ safe(debugger) }}OK"
 	end};]]
-	{"^/admin"; require"luv.contrib.admin".AdminSite(luv, require"luv.contrib.auth".modelsAdmins(), app.models.admin):urls()};
+	--{"^/admin"; require"luv.contrib.admin".AdminSite(luv, require"luv.contrib.auth".modelsAdmins(), app.models.admin):urls()};
 	{"^/sign_in/?$"; function (urlConf)
 		local loginForm = auth.forms.Login(luv:postData())
 		local user = auth.models.User:authUser(luv:session(), loginForm)
