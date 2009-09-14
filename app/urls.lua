@@ -15,7 +15,7 @@ luv:assign{
 
 local function authUser (urlConf)
 	local user = auth.models.User:authUser(luv:session())
-	if not user or not user.isActive then luv:responseHeader("Location", urlConf:baseUri().."/sign_in"):sendHeaders() end
+	if not user or not user.active then luv:responseHeader("Location", urlConf:baseUri().."/sign_in"):sendHeaders() end
 	return user
 end
 
@@ -38,14 +38,14 @@ return {
 		end};
 		{"^/allUp$"; function ()
 			local migrations = require"luv.contrib.migrations"
-			local manager = migrations.MigrationManager(luv:db(), "app/migrations");
+			local manager = migrations.MigrationManager(luv:db(), "app/migrations")
 			manager:logger(migrationsLogger)
 			manager:allUp()
 			ok()
 		end};
 		{"^/allDown$"; function ()
 			local migrations = require"luv.contrib.migrations"
-			local manager = migrations.MigrationManager(luv:db(), "app/migrations");
+			local manager = migrations.MigrationManager(luv:db(), "app/migrations")
 			manager:logger(migrationsLogger)
 			manager:allDown()
 			ok()
@@ -56,8 +56,11 @@ return {
 		require"luv.tests".all:run()
 	end};]]
 	--[[{"^/reinstall/?$"; function ()
+		local migrations = require"luv.contrib.migrations"
 		models.dropModels(models.Model.modelsList)
 		models.createModels(models.Model.modelsList)
+		local manager = migrations.MigrationManager(luv:db(), "app/migrations")
+		manager:markAllUp()
 		local temiy = auth.models.User:create{login="temiy";name="Шеин Артём Александрович";passwordHash=auth.models.User:encodePassword "123456"}
 		app.models.Options:create{user=temiy}
 		luv:displayString "{{ safe(debugger) }}OK"
@@ -66,8 +69,10 @@ return {
 	{"^/sign_in/?$"; function (urlConf)
 		local loginForm = auth.forms.Login(luv:postData())
 		local user = auth.models.User:authUser(luv:session(), loginForm)
-		if user and user.isActive then
+		if user and user.active then
 			luv:responseHeader("Location", "/"):sendHeaders()
+		elseif user then
+			loginForm:addError(("Your account has been disabled."):tr())
 		end
 		luv:assign{title="authorisation";loginForm=loginForm}
 		luv:display"sign_in.html"
