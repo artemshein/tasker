@@ -8,6 +8,7 @@ return migrations.Migration:extend{
 	end;
 	up = function (self)
 		self:db():CreateTable"notification"
+		:field("id", "INT", {primaryKey=true;serial=true})
 		:field("to", "INT", {null=false})
 		:field("dateCreated", "DATETIME", {null=true})
 		:field("dateSended", "DATETIME", {null=true})

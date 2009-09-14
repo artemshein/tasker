@@ -71,6 +71,7 @@
 	};
 	jQuery.fn.inlineEditAjaxField = function (url, id, field, callback)
 	{
+<<<<<<< HEAD:js/luv/forms.js
 		var self = this;
 		var value = jQuery("#"+this.attr("id")+"Value");
 		function setValue (text) {
@@ -93,6 +94,31 @@
 		value.click(function () {
 			self.show().focus();
 			value.hide();
+=======
+		function setValue (self, val)
+		{
+			self.text(val);
+			if (val)
+				self.removeClass("emptyInlineEditValue");
+			else
+				self.addClass("emptyInlineEditValue");
+		}
+		var value = jQuery("#"+this.attr("id")+"Value").addClass("inlineEditValue");
+		var self = this;
+		var newCallback = function (self, field, currentValue) {
+			if (!callback || callback(self, field, currentValue))
+			{
+				self.hide();
+				setValue(value, self.fieldVal());
+				value.show();
+			}
+		}
+		this.ajaxField(url, id, field, newCallback);
+		setValue(value, self.fieldVal());
+		value.click(function () {
+			value.hide();
+			self.show().focus().select();
+>>>>>>> 6a43dc4cac113ef633dc60d3d315e292f9b3c901:js/luv/forms.js
 		});
 		this.removeClass("ajaxField").addClass("inlineEditAjaxField").hide();
 		value.addClass("inlineEditValue");

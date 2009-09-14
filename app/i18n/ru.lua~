@@ -114,8 +114,14 @@ tasker="задачник";
 ["tasks list"]="список задач";
 ["tasks per page"]="задач на странице";
 term="срок";
+<<<<<<< HEAD:app/i18n/ru.lua
 ["term (date)"]="срок (дата)";
 ["term (time)"]="срок (время)";
+=======
+["term (date)"]="сроки (дата)";
+["term (time)"]="сроки (время)";
+text="текст";
+>>>>>>> 6a43dc4cac113ef633dc60d3d315e292f9b3c901:app/i18n/ru.lua
 ["ToDo list"]="ToDo-лист";
 title="название";
 ["till date"]="заканчивая датой";

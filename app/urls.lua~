@@ -26,6 +26,18 @@ local function requireAuth (func)
 	end 
 end
 
+<<<<<<< HEAD:app/urls.lua
+local function ajaxForm (form, func)
+	return requireAuth(function (urlConf, user)
+		setfenv(func, {urlConf=urlConf;user=user})
+		if not form(luv:postData()):processAjaxForm(func) then
+			ws.Http403()
+		end
+	end)
+end
+
+=======
+>>>>>>> 6a43dc4cac113ef633dc60d3d315e292f9b3c901:app/urls.lua
 local ok = function () luv:displayString"{{ safe(debugger) }}OK" end
 local migrationsLogger = function (text) io.write(text, "<br />") end
 

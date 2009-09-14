@@ -65,8 +65,13 @@ local Options = models.Model:extend{
 	__tag = .....".Options";
 	Meta = {labels={"options";"options"}};
 	user = references.OneToOne{references=auth.models.User;required=true};
+<<<<<<< HEAD:app/models.lua
+	tasksPerPage = fields.Int{label="tasks per page";defaultValue=20;required=true;choices={{10;10};{20;20};{30;30};{40;40};{50;50}}};
+	notifFreq = fields.Int{label="frequency of notifications";defaultValue=24*60*60;required=true;choices={{60*60;("once an hour"):tr()};{24*60*60;("once a day"):tr()};{7*24*60*60;("once a week"):tr()}}};
+=======
 	tasksPerPage = fields.Int{label="tasks per page";defaultValue=10;required=true;choices={{10;10};{20;20};{30;30};{40;40};{50;50}}};
 	notifFreq = fields.Int{label="frequency of notifications";defaultValue=24*60*60;required=true;choices={{0;("never"):tr()};{60*60;("once an hour"):tr()};{24*60*60;("once a day"):tr()};{7*24*60*60;("once a week"):tr()}}};
+>>>>>>> 6a43dc4cac113ef633dc60d3d315e292f9b3c901:app/models.lua
 }
 
 local Notification = models.Model:extend{

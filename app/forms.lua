@@ -22,8 +22,8 @@ local CreateTask = forms.ModelForm:extend{
 		forms.ModelForm.init(self, ...)
 		local dateId = self:field"dateToBeDone":id()
 		local timeId = self:field"timeToBeDone":id()
-		self:field "dateToBeDone":onChange("$(this).val() == ''? $('#"..timeId.."').attr('disabled', 'disabled') : $('#"..timeId.."').removeAttr('disabled');")
-		self:field "timeToBeDone":onLoad("$('#"..timeId.."').attr('disabled', $('#"..dateId.."').fieldRawVal() == ''? 'disabled' : null);")
+		self:field"dateToBeDone":onChange("$(this).val() == ''? $('#"..timeId.."').attr('disabled', 'disabled') : $('#"..timeId.."').removeAttr('disabled');")
+		self:field"timeToBeDone":onLoad("$('#"..timeId.."').attr('disabled', $('#"..dateId.."').fieldRawVal() == ''? 'disabled' : null);")
 	end;
 }
 
@@ -63,7 +63,7 @@ local SignUp = forms.Form:extend{
 	name = auth.models.User:field"name":clone():required(true):label"full name";
 	email = auth.models.User:field"email":clone():required(true);
 	register = fields.Submit(("register"):tr():capitalize());
-	isValid = function (self)
+	valid = function (self)
 		local res = forms.Form.valid(self)
 		if self.password ~= self.repeatPassword then
 			res = false
