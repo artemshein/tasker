@@ -60,7 +60,9 @@ return {
 		models.dropModels(models.Model.modelsList)
 		models.createModels(models.Model.modelsList)
 		local manager = migrations.MigrationManager(luv:db(), "app/migrations")
-		manager:markAllUp()
+		if manager:currentMigration() ~= manager:lastMigration() then
+			manager:markAllUp()
+		end
 		local temiy = auth.models.User:create{login="temiy";name="Шеин Артём Александрович";passwordHash=auth.models.User:encodePassword "123456"}
 		app.models.Options:create{user=temiy}
 		luv:displayString "{{ safe(debugger) }}OK"
