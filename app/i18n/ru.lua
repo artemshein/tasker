@@ -8,6 +8,7 @@ return {
 -- A
 action="действие";
 administrator="администратор";
+addressee="адресат";
 apply="применить";
 April="апреля";
 ["Artyom Shein"]="Шеин Артём";

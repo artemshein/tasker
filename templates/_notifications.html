@@ -3,11 +3,12 @@
 {% else %}
 	{% local pageNav = include("_pagenav.html", {func="showLogsPage"}) %}
 	{{ pageNav }}
-	<table><thead><tr><td>{{ ("text"):tr():capitalize() }}</td><td>{{ ("date created"):tr():capitalize() }}</td><td>{{ ("date sended"):tr():capitalize() }}</td></tr></thead><tbody>
+	<table><thead><tr><td>{{ ("text"):tr():capitalize() }}</td><td>{{ ("date created"):tr():capitalize() }}</td><td>{{ ("addressee"):tr():capitalize() }}</td><td>{{ ("date sended"):tr():capitalize() }}</td></tr></thead><tbody>
 	{% for _, notification in notifications() do %}
 		<td>
 		{{ safe(notification.text) }}
 		</td>
+		<td>{{ notification.to }}</td>
 		<td>{{ date("%c", notification.dateCreated) }}</td>
 		<td>{% if notification.dateSended then %}{{ date("%c", notification.dateSended) }}{% else %}{{ ("never"):tr() }}{% end %}</td>
 	</tr>
