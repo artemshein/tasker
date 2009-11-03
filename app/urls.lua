@@ -8,6 +8,7 @@ local app = {models=require"app.models";forms=require"app.forms"}
 local ws = require"luv.webservers"
 local json = require"luv.utils.json"
 local utils = require"luv.utils"
+local fs = require"luv.fs"
 
 luv:assign{
 	empty=table.empty;pairs=pairs;ipairs=ipairs;version=version;
@@ -54,9 +55,21 @@ return {
 	}};
 	{"^/test/?$"; function ()
 		io.write"<pre>"
+		local cov = require"luv.dev.coverage".Coverage()
 		require"luv.tests".all:run()
-	end};]]
-	--[[{"^/reinstall/?$"; function ()
+		fs.File"out/coverage.html":openWriteAndClose([  [
+			<html><head>
+				<title>Luv unittest coverage</title>
+				<style>
+					.covered{background-color:#DFD}
+					.notCovered{background-color:#FDD}
+					.empty{background-color:#DDD}
+				</style>
+			</head>
+			<body>
+			] ]..cov:fullInfoAsHtml()..[ [</body></html>] ])
+	end};
+	{"^/reinstall/?$"; function ()
 		local migrations = require"luv.contrib.migrations"
 		models.dropModels(models.Model.modelsList)
 		models.createModels(models.Model.modelsList)
@@ -213,7 +226,7 @@ return {
 		local task = app.models.Task:find(taskId)
 		if not task then ws.Http404() end
 		local f = app.forms.EditTask()
-		f:action("/ajax/task/"..taskId.."/save.json")
+		f:htmlAction("/ajax/task/"..taskId.."/save.json")
 		f:initForm(task)
 		luv:assign{title=tostring(task);user=user;task=task;editTaskForm=f}
 		luv:display"task.html"

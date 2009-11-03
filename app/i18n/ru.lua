@@ -8,6 +8,7 @@ return {
 -- A
 action="действие";
 administrator="администратор";
+addressee="адресат";
 apply="применить";
 April="апреля";
 ["Artyom Shein"]="Шеин Артём";
@@ -60,7 +61,6 @@ July="июля";
 ["in title"]="в названии";
 ["Invalid authorisation data."]="Неверные учетные данные.";
 -- L
-["log in"]="войти";
 ["log of changes"]="журнал изменений";
 login="логин";
 logout="выйти";
@@ -104,6 +104,7 @@ reports="отчеты";
 save="сохранить";
 September="сентября";
 status="статус";
+["sign in"]="войти";
 ["sign out"]="выйти";
 ["sign up"]="регистрация";
 ['Sign up complete. Now you can <a href="/">sign in</a>.']='Регистрация завершена. Теперь вы можете <a href="/">войти</a>.';

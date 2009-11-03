@@ -85,7 +85,7 @@ local TasksFilter = forms.Form:extend{
 		action="/ajax/task/filter-list.json";
 		ajax='{success: onTasksFilter, dataType: "json"}';
 		fields={"title";"status";"self"};
-		widget=require"luv.forms.widgets".FlowForm();
+		widget=require"luv.forms.widgets".Flow();
 	};
 	title = fields.Text{label=("in title"):tr():capitalize()};
 	status = fields.Text{
@@ -118,7 +118,7 @@ local LogsFilter = forms.Form:extend{
 		action="/ajax/log/filter-list.json";
 		ajax='{success: onLogsFilter, dataType: "json"}';
 		fields={"act";"mine"};
-		widget=require"luv.forms.widgets".FlowForm();
+		widget=require"luv.forms.widgets".Flow();
 	};
 	act = fields.Text{
 		label = ("action"):tr():capitalize();
