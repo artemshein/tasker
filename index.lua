@@ -37,8 +37,6 @@ try(function ()
 	}
 	luv:db():logger(function (sql, result) luv:debug(sql..", returns "..("table" == type(result) and "table" or tostring(result)), "Database") end)
 	--luv:cacher():logger(function (sql, result) luv:debug(sql..", returns "..("table" == type(result) and (#result.." rows") or tostring(result)), "Cacher") end)
-	-- luv:setCacher(TagEmuWrapper(Memcached()):setLogger(function (msg) luv:debug(msg, "Cacher") end))
-	-- luv:getCacher():clear()
 	require"luv.contrib.auth".models.User:secretSalt(secretSalt)
 	if not luv:dispatch"app/urls.lua" then
 		ws.Http404()

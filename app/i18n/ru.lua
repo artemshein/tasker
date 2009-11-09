@@ -79,6 +79,7 @@ notifications="оповещения";
 November="ноября";
 ["No records."]="Нет записей.";
 ["No tasks satisfying the request."]="Нет задач удовлетворяющих запросу.";
+['Notifications from "Tasker"']='Оповещения от "Задачника"';
 -- O
 ["only that for me"]="только то, что касается меня";
 ["old password"]="старый пароль";
