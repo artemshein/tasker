@@ -25,7 +25,7 @@
 			</td>
 			<td style="text-align:center">{{ task.status or "" }}</td>
 			<td style="text-align:center">{{ task.assignedTo or "" }}</td>
-			<td style="text-align:center;white-space:nowrap">{{ task.timeToBeDone or "" }}{{ task.dateToBeDone or "" }}</td>
+			<td style="text-align:center;white-space:nowrap">{{ task:field"timeToBeDone" }} {{ task:field"dateToBeDone" }}</td>
 		{% end %}
 		<td style="text-align:center">{{ task.createdBy }}</td>
 	</tr>

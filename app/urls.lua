@@ -97,131 +97,186 @@ return {
 		user:logout(luv:session())
 		luv:responseHeader("Location", "/"):sendHeaders()
 	end};
-	{"^/ajax/log/list/?$"; requireAuth % function (urlConf, user)
-		local findLogsForm = app.forms.FindLogs(luv:postData())
-		if not findLogsForm:submitted() or not findLogsForm:valid() then
-			ws.Http403()
-		end
-		local p = models.Paginator(app.models.Log, 50):order"-dateTime"
-		local page = tonumber(luv:post"page") or 1
-		local logsFilter = luv:session().logsFilter or {}
-		if logsFilter.action and "" ~= logsFilter.action then
-			p:filter{action=logsFilter.action}
-		end
-		if logsFilter.mine then
-			p:filter{user=user}
-		end
-		luv:assign{p=p;page=page;logs=p:page(page)}
-		luv:display"_logs.html"
-	end};
-	{"^/ajax/notification/list/?$"; requireAuth % function (urlConf, user)
-		local p = models.Paginator(app.models.Notification, 50):order"-dateCreated"
-		local page = tonumber(luv:post"page") or 1
-		luv:assign{p=p;page=page;notifications=p:page(page)}
-		luv:display"_notifications.html"
-	end};
-	{"^/ajax/task/list/?$"; requireAuth % function (urlConf, user)
-		-- Filtered tasks list
-		local findTasksForm = app.forms.FindTasks(luv:postData())
-		if not findTasksForm:submitted() or not findTasksForm:valid() then
-			ws.Http403()
-		end
-		local p = models.Paginator(app.models.Task, user.options and user.options.tasksPerPage or 10):order"-dateCreated"
-		local page = tonumber(luv:post"page") or 1
-		local tasksFilter = luv:session().tasksFilter or {}
-		if tasksFilter.title and "" ~= tasksFilter.title then
-			p:filter{title__contains=tasksFilter.title}
-		end
-		if tasksFilter.self then
-			p:filter(Q{assignedTo=user}-Q{createdBy=user})
-		end
-		if tasksFilter.status then
-			if "new" == tasksFilter.status then
-				p:filter{status__in=app.models.Task:newStatuses()}
-			elseif "inProgress" == tasksFilter.status then
-				p:exclude{status__in=app.models.Task:newStatuses()}
-				p:exclude{status__in=app.models.Task:doneStatuses()}
-			elseif "notCompleted" == tasksFilter.status then
-				p:exclude{status__in=app.models.Task:doneStatuses()}
-			elseif "completed" == tasksFilter.status then
-				p:filter{status__in=app.models.Task:doneStatuses()}
-			end
-		end
-		luv:assign{user=user;p=p;page=page;tasks=p:page(page)}
-		luv:display"_tasks.html"
-	end};
-	{"/ajax/task/field%-set%.json"; requireAuth % function (urlConf, user)
-		local res = app.models.Task:ajaxFieldHandler(luv:postData(), function (f, task)
-			local res = task.createdBy == user or task.assignedTo == user
-			-- Notify old executor when executor is changed
-			if "assignedTo" == f.field and task.assignedTo and f.value ~= task.assignedTo.pk and user ~= task.assignedTo then
-				app.models.Notification:create{
-					to=task.assignedTo;
-					text=("%(user)s changed the task %(task)s field %(field)s value to %(value)s."):tr() % {
-						user=tostring(user);
-						task=("%q"):format(tostring(task));
-						field=("%q"):format(f.field);
-						value=("%q"):format(f.value);
-					};
-				}
-			end
-			return res
-		end, function (f, task)
-			app.models.Log:logTaskEdit(task, user)
-			-- Notify executor when owner changes the task
-			if task.assignedTo and task.assignedTo ~= user then
-				app.models.Notification:create{
-					to=task.assignedTo;
-					text=("%(user)s changed the task %(task)s field %(field)s value to %(value)s."):tr() % {
-						user=tostring(user);
-						task=("%q"):format(tostring(task));
-						field=("%q"):format(f.field);
-						value=("%q"):format(f.value);
-					};
-				}
-			end
-			-- Notify owner when executor finishes the task
-			if "status" == f.field and task:isDone() and user ~= task.createdBy then
-				app.models.Notification:create{
-					to=task.createdBy;
-					text=("%(user)s marked the task %(task)s as completed."):tr() % {user=tostring(user);task=("%q"):format(tostring(task))};
-				}
-			end
-		end)
-		if not res then
-			ws.Http403()
-		end
-	end};
-	{"/ajax/task/delete%.json"; requireAuth % function (urlConf, user)
-		app.forms.DeleteTask(luv:postData()):processAjaxForm(function (self)
-			local task = app.models.Task:find(self.id)
-			if task and task.createdBy == user then
-				if task.assignedTo and task.assignedTo ~= user then
-					self:addMsg"add notification!"
-					app.models.Notification:create{
-						to=task.assignedTo;
-						text=("Task %(task)s has been deleted."):tr() % {task=("%q"):format(tostring(task))};
-					}
+	{"^/ajax"; {
+		{"^/task"; {
+			{"^/list/?$"; requireAuth % function (urlConf, user)
+				-- Filtered tasks list
+				local findTasksForm = app.forms.FindTasks(luv:postData())
+				if not findTasksForm:submitted() or not findTasksForm:valid() then
+					ws.Http403()
 				end
-				task:delete()
-				app.models.Log:logTaskDelete(task, user)
-			else
-				return false
-			end
-		end)
-	end};
-	{"^/ajax/task/(%d+)/save.json"; requireAuth % function (urlConf, user, taskId)
-		local task = app.models.Task:find(taskId)
-		if not task then
-			ws.Http404()
-		end
-		local f = app.forms.EditTask(luv:postData())
-		f:processAjaxForm(function (self)
-			self:initModel(task)
-			task:update()
-			app.models.Log:logTaskEdit(task, user)
-		end)
-	end};
+				local p = models.Paginator(app.models.Task, user.options and user.options.tasksPerPage or 10):order"-dateCreated"
+				local page = tonumber(luv:post"page") or 1
+				local tasksFilter = luv:session().tasksFilter or {}
+				if tasksFilter.title and "" ~= tasksFilter.title then
+					p:filter{title__contains=tasksFilter.title}
+				end
+				if tasksFilter.self then
+					p:filter(Q{assignedTo=user}-Q{createdBy=user})
+				end
+				if tasksFilter.status then
+					if "new" == tasksFilter.status then
+						p:filter{status__in=app.models.Task:newStatuses()}
+					elseif "inProgress" == tasksFilter.status then
+						p:exclude{status__in=app.models.Task:newStatuses()}
+						p:exclude{status__in=app.models.Task:doneStatuses()}
+					elseif "notCompleted" == tasksFilter.status then
+						p:exclude{status__in=app.models.Task:doneStatuses()}
+					elseif "completed" == tasksFilter.status then
+						p:filter{status__in=app.models.Task:doneStatuses()}
+					end
+				end
+				luv:assign{user=user;p=p;page=page;tasks=p:page(page)}
+				luv:display"_tasks.html"
+			end};
+			{"^/field%-set%.json$"; requireAuth % function (urlConf, user)
+				local res = app.models.Task:ajaxFieldHandler(luv:postData(), function (f, task)
+					local res = task.createdBy == user or task.assignedTo == user
+					-- Notify old executor when executor is changed
+					if "assignedTo" == f.field and task.assignedTo and f.value ~= task.assignedTo.pk and user ~= task.assignedTo then
+						app.models.Notification:create{
+							to=task.assignedTo;
+							text=("%(user)s changed the task %(task)s field %(field)s value to %(value)s."):tr() % {
+								user=tostring(user);
+								task=("%q"):format(tostring(task));
+								field=("%q"):format(f.field);
+								value=("%q"):format(f.value);
+							};
+						}
+					end
+					return res
+				end, function (f, task)
+					app.models.Log:logTaskEdit(task, user)
+					-- Notify executor when owner changes the task
+					if task.assignedTo and task.assignedTo ~= user then
+						app.models.Notification:create{
+							to=task.assignedTo;
+							text=("%(user)s changed the task %(task)s field %(field)s value to %(value)s."):tr() % {
+								user=tostring(user);
+								task=("%q"):format(tostring(task));
+								field=("%q"):format(f.field);
+								value=("%q"):format(f.value);
+							};
+						}
+					end
+					-- Notify owner when executor finishes the task
+					if "status" == f.field and task:isDone() and user ~= task.createdBy then
+						app.models.Notification:create{
+							to=task.createdBy;
+							text=("%(user)s marked the task %(task)s as completed."):tr() % {user=tostring(user);task=("%q"):format(tostring(task))};
+						}
+					end
+				end)
+				if not res then
+					ws.Http403()
+				end
+			end};
+			{"^/delete%.json$"; requireAuth % function (urlConf, user)
+				app.forms.DeleteTask(luv:postData()):processAjaxForm(function (self)
+					local task = app.models.Task:find(self.id)
+					if task and task.createdBy == user then
+						if task.assignedTo and task.assignedTo ~= user then
+							self:addMsg"add notification!"
+							app.models.Notification:create{
+								to=task.assignedTo;
+								text=("Task %(task)s has been deleted."):tr() % {task=("%q"):format(tostring(task))};
+							}
+						end
+						task:delete()
+						app.models.Log:logTaskDelete(task, user)
+					else
+						return false
+					end
+				end)
+			end};
+			{"^/(%d+)/save.json"; requireAuth % function (urlConf, user, taskId)
+				local task = app.models.Task:find(taskId)
+				if not task then
+					ws.Http404()
+				end
+				local f = app.forms.EditTask(luv:postData())
+				f:processAjaxForm(function (self)
+					self:initModel(task)
+					task:update()
+					app.models.Log:logTaskEdit(task, user)
+				end)
+			end};
+			{"^/filter%-list%.json$"; requireAuth % function (urlConf, user)
+				app.forms.TasksFilter(luv:postData()):processAjaxForm(function (self)
+					self:initModel(luv:session())
+					luv:session():save()
+				end)
+			end};
+			{"^/create%.json$"; requireAuth % function (urlConf, user)
+				app.forms.CreateTask(luv:postData()):processAjaxForm(function (self)
+					local task = app.models.Task()
+					self:initModel(task)
+					task.createdBy = user
+					task:insert()
+					app.models.Log:logTaskCreate(task, user)
+				end)
+			end};
+		}};
+		{"^/log"; {
+			{"^/list/?$"; requireAuth % function (urlConf, user)
+				local findLogsForm = app.forms.FindLogs(luv:postData())
+				if not findLogsForm:submitted() or not findLogsForm:valid() then
+					ws.Http403()
+				end
+				local p = models.Paginator(app.models.Log, 50):order"-dateTime"
+				local page = tonumber(luv:post"page") or 1
+				local logsFilter = luv:session().logsFilter or {}
+				if logsFilter.action and "" ~= logsFilter.action then
+					p:filter{action=logsFilter.action}
+				end
+				if logsFilter.mine then
+					p:filter{user=user}
+				end
+				luv:assign{p=p;page=page;logs=p:page(page)}
+				luv:display"_logs.html"
+			end};
+			{"^/filter%-list%.json$"; requireAuth % function (urlConf, user)
+				app.forms.LogsFilter(luv:postData()):processAjaxForm(function (self)
+					self:initModel(luv:session())
+					luv:session():save()
+				end)
+			end};
+		}};
+		{"^/notification/list/?$"; requireAuth % function (urlConf, user)
+			local p = models.Paginator(app.models.Notification, 50):order"-dateCreated"
+			local page = tonumber(luv:post"page") or 1
+			luv:assign{p=p;page=page;notifications=p:page(page)}
+			luv:display"_notifications.html"
+		end};
+		{"^/save%-options%.json$"; requireAuth % function (urlConf, user)
+			app.forms.Options(luv:postData()):processAjaxForm(function (self)
+				if not user:comparePassword(self.password) then
+					self:addError(("Wrong password."):tr())
+					return false
+				end
+				if "" ~= self.newPassword then
+					if self.newPassword ~= self.newPassword2 then
+						self:addError(("Passwords don't match."):tr())
+						return false
+					else
+						user.passwordHash = auth.models.User:encodePassword(self.newPassword)
+					end
+				end
+				user.name = self.fullName
+				user.email = self.email
+				if not user:save() then
+					self:addErrors(user:errors())
+					return false
+				end
+				local options = user.options or app.models.Options()
+				self:initModel(options)
+				if not options:save() then
+					self:addErrors(options:errors())
+					return false
+				end
+			end)
+		end};
+	}};
 	{"^/task/(%d+)/?$"; requireAuth % function (urlConf, user, taskId)
 		local task = app.models.Task:find(taskId)
 		if not task then ws.Http404() end
@@ -249,58 +304,9 @@ return {
 		luv:assign{title="sign up";registrationForm=f}
 		luv:display"registration.html"
 	end};
-	{"^/ajax/task/filter%-list%.json$"; requireAuth % function (urlConf, user)
-		app.forms.TasksFilter(luv:postData()):processAjaxForm(function (self)
-			self:initModel(luv:session())
-			luv:session():save()
-		end)
-	end};
-	{"^/ajax/log/filter%-list%.json$"; requireAuth % function (urlConf, user)
-		app.forms.LogsFilter(luv:postData()):processAjaxForm(function (self)
-			self:initModel(luv:session())
-			luv:session():save()
-		end)
-	end};
 	{"^/help/?$"; function ()
 		luv:assign{title="Помощь"}
 		luv:display"help.html"
-	end};
-	{"^/ajax/task/create%.json$"; requireAuth % function (urlConf, user)
-		app.forms.CreateTask(luv:postData()):processAjaxForm(function (self)
-			local task = app.models.Task()
-			self:initModel(task)
-			task.createdBy = user
-			task:insert()
-			app.models.Log:logTaskCreate(task, user)
-		end)
-	end};
-	{"^/ajax/save%-options%.json"; requireAuth % function (urlConf, user)
-		app.forms.Options(luv:postData()):processAjaxForm(function (self)
-			if not user:comparePassword(self.password) then
-				self:addError(("Wrong password."):tr())
-				return false
-			end
-			if "" ~= self.newPassword then
-				if self.newPassword ~= self.newPassword2 then
-					self:addError(("Passwords don't match."):tr())
-					return false
-				else
-					user.passwordHash = auth.models.User:encodePassword(self.newPassword)
-				end
-			end
-			user.name = self.fullName
-			user.email = self.email
-			if not user:save() then
-				self:addErrors(user:errors())
-				return false
-			end
-			local options = user.options or app.models.Options()
-			self:initModel(options)
-			if not options:save() then
-				self:addErrors(options:errors())
-				return false
-			end
-		end)
 	end};
 	{"^/?$"; requireAuth % function (urlConf, user)
 		local createTaskForm = app.forms.CreateTask()
@@ -356,17 +362,23 @@ return {
 		-- Find not sended
 		for _, notif in app.models.Notification:all():filter{dateSended__isnull=true}() do
 			notifsByEmail[notif.to.email] = notifsByEmail[notif.to.email] or {}
-			table.insert(notifsByEmail[notif.to.email], notif)
+			table.insert(notifsByEmail[notif.to.email], notif.text)
+		end
+		-- Find uncompleted tasks with term in past
+		local time = os.time()
+		for _, task in app.models.Task:all():filter(Q{dateToBeDone__lt=time}-Q{dateToBeDone=time;timeToBeDone__lte=time}):filter{status__in=app.models.Task._doneStatuses}:filter{assignedTo__isnull=false}() do
+			notifsByEmail[task.assignedTo.email] = notifsByEmail[task.assignedTo.email] or {}
+			table.insert(notifsByEmail[task.assignedTo.email], ('Uncompleted task %s.'):tr():format(tostring(task)))
 		end
 		-- Send founded
 		for email, notifs in pairs(notifsByEmail) do
 			local body = ""
 			if #notifs > 1 then
 				for i, notif in ipairs(notifs) do
-					body = body..tostring(i)..". "..notif.text.."\n"
+					body = body..tostring(i)..". "..notif.."\n"
 				end
 			else
-				body = notifs[1].text
+				body = notifs[1]
 			end
 			utils.sendEmail(mailFrom, email, ('Notifications from "Tasker"'):tr(), body, mailServer)
 		end
