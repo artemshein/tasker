@@ -61,6 +61,7 @@ July="июля";
 ["in title"]="в названии";
 ["Invalid authorisation data."]="Неверные учетные данные.";
 -- L
+language="язык";
 ["log of changes"]="журнал изменений";
 login="логин";
 logout="выйти";
@@ -128,6 +129,7 @@ user="пользователь";
 users="пользователи";
 ["user's options"]="настройки пользователя";
 ["user's manual"]="руководство пользователя";
+['Uncompleted task "%s" with term in the past.']='Незавершенная задача "%s" с истекшим сроком.';
 -- V
 version="версия";
 -- W

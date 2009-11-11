@@ -357,18 +357,26 @@ return {
 		}
 		luv:display"report.html"
 	end};
+	{"^/cron/daily/u29dbsl30ocnsl$"; function (urlConf)
+		local i18nByEmail = {}
+		-- Find uncompleted tasks with term in the past
+		local time = os.time()
+		for _, task in app.models.Task:all():filter(Q{dateToBeDone__lt=time}-Q{dateToBeDone=time;timeToBeDone__lte=time}):exclude{status__in=app.models.Task._doneStatuses}:filter{assignedTo__isnull=false}() do
+			local email = task.assignedTo.email
+			i18nByEmail[email] = i18nByEmail[email] or require"luv.i18n".I18n("app/i18n", task.assignedTo.options.lang or "en", false)
+			app.models.Notification:create{to=task.assignedTo;dateCreated=time;text=i18nByEmail[email]:tr('Uncompleted task "%s" with term in the past.'):format(tostring(task))}
+		end
+		ok()
+	end};
 	{"^/cron/hourly/sadfj23iasb23l2$"; function (urlConf)
 		local notifsByEmail = {}
+		local i18nByEmail = {}
 		-- Find not sended
 		for _, notif in app.models.Notification:all():filter{dateSended__isnull=true}() do
-			notifsByEmail[notif.to.email] = notifsByEmail[notif.to.email] or {}
-			table.insert(notifsByEmail[notif.to.email], notif.text)
-		end
-		-- Find uncompleted tasks with term in past
-		local time = os.time()
-		for _, task in app.models.Task:all():filter(Q{dateToBeDone__lt=time}-Q{dateToBeDone=time;timeToBeDone__lte=time}):filter{status__in=app.models.Task._doneStatuses}:filter{assignedTo__isnull=false}() do
-			notifsByEmail[task.assignedTo.email] = notifsByEmail[task.assignedTo.email] or {}
-			table.insert(notifsByEmail[task.assignedTo.email], ('Uncompleted task %s.'):tr():format(tostring(task)))
+			local email = notif.to.email
+			notifsByEmail[email] = notifsByEmail[email] or {}
+			i18nByEmail[email] = i18nByEmail[email] or require"luv.i18n".I18n("app/i18n", notif.to.options.lang or "en", false)
+			table.insert(notifsByEmail[email], i18nByEmail[email]:tr(notif.text))
 		end
 		-- Send founded
 		for email, notifs in pairs(notifsByEmail) do
@@ -380,7 +388,7 @@ return {
 			else
 				body = notifs[1]
 			end
-			utils.sendEmail(mailFrom, email, ('Notifications from "Tasker"'):tr(), body, mailServer)
+			utils.sendEmail(mailFrom, email, i18nByEmail[email]:tr('Notifications from "Tasker"'), body, mailServer)
 		end
 		-- Mark as sended
 		app.models.Notification:all():filter{dateSended__isnull=true}:update{dateSended=os.date("%Y-%m-%d %H:%M:%S")}
