@@ -27,7 +27,7 @@
 			<td style="text-align:center">{{ task.assignedTo or "" }}</td>
 			<td style="text-align:center;white-space:nowrap">{{ task:field"timeToBeDone" }} {{ task:field"dateToBeDone" }}</td>
 		{% end %}
-		<td style="text-align:center">{{ task.createdBy }}</td>
+		<td>{{ task.createdBy }}</td>
 	</tr>
 	{% end %}
 	</tbody></table>
