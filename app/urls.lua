@@ -18,8 +18,9 @@ luv:assign{
 }
 
 local function authUser (urlConf)
-	local user = auth.models.User:authUser(luv:session())
-	if not user or not user.active then luv:responseHeader("Location", urlConf:baseUri().."/sign_in"):sendHeaders() end
+	local request = urlConf:request()
+	local user = auth.models.User:authUser(request:session())
+	if not user or not user.active then request:wsApi():responseHeader("Location", urlConf:baseUri().."/sign_in"):sendHeaders() end
 	return user
 end
 
@@ -83,10 +84,11 @@ return {
 	end};]=]
 	--{"^/admin"; require"luv.contrib.admin".AdminSite(luv, require"luv.contrib.auth".modelsAdmins(), app.models.admin):urls()};
 	{"^/sign_in/?$"; function (urlConf)
-		local loginForm = auth.forms.Login(luv:postData())
-		local user = auth.models.User:authUser(luv:session(), loginForm)
+		local request = urlConf:request()
+		local loginForm = auth.forms.Login(request:postData())
+		local user = auth.models.User:authUser(request:session(), loginForm)
 		if user and user.active then
-			luv:responseHeader("Location", "/"):sendHeaders()
+			request:wsApi():responseHeader("Location", "/"):sendHeaders()
 		elseif user then
 			loginForm:addError(("Your account has been disabled."):tr())
 		end
@@ -95,19 +97,20 @@ return {
 	end};
 	{"^/sign_out/?$"; requireAuth % function (urlConf, user)
 		user:logout(luv:session())
-		luv:responseHeader("Location", "/"):sendHeaders()
+		urlConf:request():wsApi():responseHeader("Location", "/"):sendHeaders()
 	end};
 	{"^/ajax"; {
 		{"^/task"; {
 			{"^/list/?$"; requireAuth % function (urlConf, user)
+				local request = urlConf:request()
 				-- Filtered tasks list
 				local findTasksForm = app.forms.FindTasks(luv:postData())
 				if not findTasksForm:submitted() or not findTasksForm:valid() then
 					ws.Http403()
 				end
 				local p = models.Paginator(app.models.Task, user.options and user.options.tasksPerPage or 10):order"-dateCreated"
-				local page = tonumber(luv:post"page") or 1
-				local tasksFilter = luv:session().tasksFilter or {}
+				local page = tonumber(request:post"page") or 1
+				local tasksFilter = request:session().tasksFilter or {}
 				if tasksFilter.title and "" ~= tasksFilter.title then
 					p:filter{title__contains=tasksFilter.title}
 				end
@@ -130,7 +133,7 @@ return {
 				luv:display"_tasks.html"
 			end};
 			{"^/field%-set%.json$"; requireAuth % function (urlConf, user)
-				local res = app.models.Task:ajaxFieldHandler(luv:postData(), function (f, task)
+				local res = app.models.Task:ajaxFieldHandler(urlConf:request():postData(), function (f, task)
 					local res = task.createdBy == user or task.assignedTo == user
 					-- Notify old executor when executor is changed
 					if "assignedTo" == f.field and task.assignedTo and f.value ~= task.assignedTo.pk and user ~= task.assignedTo then
@@ -172,7 +175,7 @@ return {
 				end
 			end};
 			{"^/delete%.json$"; requireAuth % function (urlConf, user)
-				app.forms.DeleteTask(luv:postData()):processAjaxForm(function (self)
+				app.forms.DeleteTask(urlConf:request():postData()):processAjaxForm(function (self)
 					local task = app.models.Task:find(self.id)
 					if task and task.createdBy == user then
 						if task.assignedTo and task.assignedTo ~= user then
@@ -194,7 +197,7 @@ return {
 				if not task then
 					ws.Http404()
 				end
-				local f = app.forms.EditTask(luv:postData())
+				local f = app.forms.EditTask(urlConf:request():postData())
 				f:processAjaxForm(function (self)
 					self:initModel(task)
 					task:update()
@@ -202,13 +205,14 @@ return {
 				end)
 			end};
 			{"^/filter%-list%.json$"; requireAuth % function (urlConf, user)
-				app.forms.TasksFilter(luv:postData()):processAjaxForm(function (self)
-					self:initModel(luv:session())
-					luv:session():save()
+				local request = urlConf:request()
+				app.forms.TasksFilter(request:postData()):processAjaxForm(function (self)
+					self:initModel(request:session())
+					request:session():save()
 				end)
 			end};
 			{"^/create%.json$"; requireAuth % function (urlConf, user)
-				app.forms.CreateTask(luv:postData()):processAjaxForm(function (self)
+				app.forms.CreateTask(urlConf:request():postData()):processAjaxForm(function (self)
 					local task = app.models.Task()
 					self:initModel(task)
 					task.createdBy = user
@@ -219,13 +223,14 @@ return {
 		}};
 		{"^/log"; {
 			{"^/list/?$"; requireAuth % function (urlConf, user)
-				local findLogsForm = app.forms.FindLogs(luv:postData())
+				local request = urlConf:request()
+				local findLogsForm = app.forms.FindLogs(request:postData())
 				if not findLogsForm:submitted() or not findLogsForm:valid() then
 					ws.Http403()
 				end
 				local p = models.Paginator(app.models.Log, 50):order"-dateTime"
-				local page = tonumber(luv:post"page") or 1
-				local logsFilter = luv:session().logsFilter or {}
+				local page = tonumber(request:post"page") or 1
+				local logsFilter = request:session().logsFilter or {}
 				if logsFilter.action and "" ~= logsFilter.action then
 					p:filter{action=logsFilter.action}
 				end
@@ -236,20 +241,21 @@ return {
 				luv:display"_logs.html"
 			end};
 			{"^/filter%-list%.json$"; requireAuth % function (urlConf, user)
-				app.forms.LogsFilter(luv:postData()):processAjaxForm(function (self)
-					self:initModel(luv:session())
-					luv:session():save()
+				local request = urlConf:request()
+				app.forms.LogsFilter(request:postData()):processAjaxForm(function (self)
+					self:initModel(request:session())
+					request:session():save()
 				end)
 			end};
 		}};
 		{"^/notification/list/?$"; requireAuth % function (urlConf, user)
 			local p = models.Paginator(app.models.Notification, 50):order"-dateCreated"
-			local page = tonumber(luv:post"page") or 1
+			local page = tonumber(urlConf:request():post"page") or 1
 			luv:assign{p=p;page=page;notifications=p:page(page)}
 			luv:display"_notifications.html"
 		end};
 		{"^/save%-options%.json$"; requireAuth % function (urlConf, user)
-			app.forms.Options(luv:postData()):processAjaxForm(function (self)
+			app.forms.Options(urlConf:request():postData()):processAjaxForm(function (self)
 				if not user:comparePassword(self.password) then
 					self:addError(("Wrong password."):tr())
 					return false
@@ -287,7 +293,7 @@ return {
 		luv:display"task.html"
 	end};
 	{"^/sign_up/?$"; function (urlConf)
-		local f = app.forms.SignUp(luv:postData())
+		local f = app.forms.SignUp(urlConf:request():postData())
 		if f:submitted() then
 			if f:valid() then
 				local user = auth.models.User()
@@ -309,12 +315,13 @@ return {
 		luv:display"help.html"
 	end};
 	{"^/?$"; requireAuth % function (urlConf, user)
+		local request = urlConf:request()
 		local createTaskForm = app.forms.CreateTask()
 		local tasksFilterForm = app.forms.TasksFilter()
 		local logsFilterForm = app.forms.LogsFilter()
 		local optionsForm = app.forms.Options()
-		tasksFilterForm:initForm(luv:session())
-		logsFilterForm:initForm(luv:session())
+		tasksFilterForm:initForm(request:session())
+		logsFilterForm:initForm(request:session())
 		optionsForm:initForm(user.options)
 		luv:assign{
 			title="main";user=user;createTaskForm=createTaskForm;
@@ -325,7 +332,7 @@ return {
 		luv:display"main.html"
 	end};
 	{"^/report/?$"; requireAuth % function (urlConf, user)
-		local f = app.forms.Report(luv:postData())
+		local f = app.forms.Report(urlConf:request():postData())
 		if not f:submitted() or not f:valid() then
 			ws.Http403()
 		end
