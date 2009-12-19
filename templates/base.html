@@ -12,7 +12,7 @@
 	<!--[if IE]><link rel="stylesheet" href="/css/blueprint/ie.css" type="text/css" media="screen, projection"><![endif]-->
 	<link rel="stylesheet" type="text/css" href="/css/start/jquery-ui-1.7.2.custom.css" media="all" />
 	<link rel="stylesheet" type="text/css" href="/css/common.css" media="screen, projection" />
-	<script type="text/javascript" language="JavaScript" src="/js/luv/luv.js"></script>
+	{{ safe(importJsScripts()) }}
 	<script type="text/javascript" language="JavaScript" src="/js/ui/i18n/ui.datepicker-ru.js"></script>
 </head>
 
@@ -32,12 +32,12 @@
 	<div class="user-info">
 		{% if user then %}{{ ("you are"):tr():capitalize() }} {{ user }} [<a href="/sign_out">{{ ("sign out"):tr() }} &rarr;</a>]{% else %}<a href="javascript:void(0)" onclick="alert('Call the administrator.')">{{ ("forgot password"):tr():capitalize() }}</a> | <a href="/sign_up">{{ ("sign up"):tr():capitalize() }}</a>{% end %}
 		<div id="langBar" style="text-align:right">
-			{% if luv:i18n():lang() then %}
+			{% if i18n:lang() then %}
 				<a href="javascript:setLang('en')">In English</a>
 			{% else %}
 				<span class="active">In English</span>
 			{% end %} |
-			{% if "ru" ~= luv:i18n():lang() then %}
+			{% if "ru" ~= i18n:lang() then %}
 				<a href="javascript:setLang('ru')">По-русски</a>
 			{% else %}
 				<span class="active">По-русски</span>

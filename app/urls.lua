@@ -1,5 +1,5 @@
-local require = require
-local mailFrom, mailServer = mailFrom, mailServer
+local require, tonumber, tostring, table = require, tonumber, tostring, table
+local setfenv, getfenv, os, math = setfenv, getfenv, os, math
 local forms = require"luv.forms"
 local auth = require"luv.contrib.auth"
 local fields = require"luv.fields"
@@ -12,11 +12,6 @@ local utils = require"luv.utils"
 local fs = require"luv.fs"
 local Decorator = require"luv.function".Decorator
 
-luv:assign{
-	empty=table.empty;pairs=pairs;ipairs=ipairs;version=version;
-	date=os.date;luv=luv;
-}
-
 local function authUser (urlConf)
 	local request = urlConf:request()
 	local user = auth.models.User:authUser(request:session())
@@ -25,10 +20,10 @@ local function authUser (urlConf)
 end
 
 local requireAuth = Decorator(function (func, urlConf, ...)
+	setfenv(func, getfenv(1))
 	return func(urlConf, authUser(urlConf), ...)
 end)
 
-local ok = function () luv:displayString"{{ safe(debugger) }}OK" end
 local migrationsLogger = function (text) io.write(text, "<br />") end
 
 return {
@@ -37,21 +32,21 @@ return {
 			local migrations = require"luv.contrib.migrations"
 			models.dropModels(migrations.models)
 			models.createModels(migrations.models)
-			ok()
+			templater:displayString"{{ safe(debugger) }}OK"
 		end};
 		{"^/allUp$"; function ()
 			local migrations = require"luv.contrib.migrations"
 			local manager = migrations.MigrationManager(luv:db(), "app/migrations")
 			manager:logger(migrationsLogger)
 			manager:allUp()
-			ok()
+			templater:displayString"{{ safe(debugger) }}OK"
 		end};
 		{"^/allDown$"; function ()
 			local migrations = require"luv.contrib.migrations"
 			local manager = migrations.MigrationManager(luv:db(), "app/migrations")
 			manager:logger(migrationsLogger)
 			manager:allDown()
-			ok()
+			templater:displayString"{{ safe(debugger) }}OK"
 		end};
 	}};]]
 	--[=[{"^/test/?$"; function ()
@@ -69,19 +64,19 @@ return {
 			</head>
 			<body>
 			]]..cov:fullInfoAsHtml()..[[</body></html>]])
-	end};
+	end};]=]
 	{"^/reinstall/?$"; function ()
 		local migrations = require"luv.contrib.migrations"
 		models.dropModels(models.Model.modelsList)
 		models.createModels(models.Model.modelsList)
-		local manager = migrations.MigrationManager(luv:db(), "app/migrations")
+		local manager = migrations.MigrationManager(db, "app/migrations")
 		if manager:currentMigration() ~= manager:lastMigration() then
 			manager:markAllUp()
 		end
 		local temiy = auth.models.User:create{login="temiy";name="Шеин Артём Александрович";passwordHash=auth.models.User:encodePassword "123456"}
 		app.models.Options:create{user=temiy}
-		luv:displayString "{{ safe(debugger) }}OK"
-	end};]=]
+		templater:displayString "{{ safe(debugger) }}OK"
+	end};
 	--{"^/admin"; require"luv.contrib.admin".AdminSite(luv, require"luv.contrib.auth".modelsAdmins(), app.models.admin):urls()};
 	{"^/sign_in/?$"; function (urlConf)
 		local request = urlConf:request()
@@ -92,8 +87,9 @@ return {
 		elseif user then
 			loginForm:addError(("Your account has been disabled."):tr())
 		end
-		luv:assign{title="authorisation";loginForm=loginForm}
-		luv:display"sign_in.html"
+		templater
+			:assign{title="authorisation";loginForm=loginForm}
+			:display"sign_in.html"
 	end};
 	{"^/sign_out/?$"; requireAuth % function (urlConf, user)
 		user:logout(luv:session())
@@ -104,7 +100,7 @@ return {
 			{"^/list/?$"; requireAuth % function (urlConf, user)
 				local request = urlConf:request()
 				-- Filtered tasks list
-				local findTasksForm = app.forms.FindTasks(luv:postData())
+				local findTasksForm = app.forms.FindTasks(request:postData())
 				if not findTasksForm:submitted() or not findTasksForm:valid() then
 					ws.Http403()
 				end
@@ -129,8 +125,9 @@ return {
 						p:filter{status__in=app.models.Task:doneStatuses()}
 					end
 				end
-				luv:assign{user=user;p=p;page=page;tasks=p:page(page)}
-				luv:display"_tasks.html"
+				templater
+					:assign{user=user;p=p;page=page;tasks=p:page(page)}
+					:display"_tasks.html"
 			end};
 			{"^/field%-set%.json$"; requireAuth % function (urlConf, user)
 				local res = app.models.Task:ajaxFieldHandler(urlConf:request():postData(), function (f, task)
@@ -237,8 +234,9 @@ return {
 				if logsFilter.mine then
 					p:filter{user=user}
 				end
-				luv:assign{p=p;page=page;logs=p:page(page)}
-				luv:display"_logs.html"
+				templater
+					:assign{p=p;page=page;logs=p:page(page)}
+					:display"_logs.html"
 			end};
 			{"^/filter%-list%.json$"; requireAuth % function (urlConf, user)
 				local request = urlConf:request()
@@ -251,8 +249,9 @@ return {
 		{"^/notification/list/?$"; requireAuth % function (urlConf, user)
 			local p = models.Paginator(app.models.Notification, 50):order"-dateCreated"
 			local page = tonumber(urlConf:request():post"page") or 1
-			luv:assign{p=p;page=page;notifications=p:page(page)}
-			luv:display"_notifications.html"
+			templater
+				:assign{p=p;page=page;notifications=p:page(page)}
+				:display"_notifications.html"
 		end};
 		{"^/save%-options%.json$"; requireAuth % function (urlConf, user)
 			app.forms.Options(urlConf:request():postData()):processAjaxForm(function (self)
@@ -289,8 +288,9 @@ return {
 		local f = app.forms.EditTask()
 		f:htmlAction("/ajax/task/"..taskId.."/save.json")
 		f:initForm(task)
-		luv:assign{title=tostring(task);user=user;task=task;editTaskForm=f}
-		luv:display"task.html"
+		templater
+			:assign{title=tostring(task);user=user;task=task;editTaskForm=f}
+			:display"task.html"
 	end};
 	{"^/sign_up/?$"; function (urlConf)
 		local f = app.forms.SignUp(urlConf:request():postData())
@@ -307,12 +307,14 @@ return {
 				end
 			end
 		end
-		luv:assign{title="sign up";registrationForm=f}
-		luv:display"registration.html"
+		templater
+			:assign{title="sign up";registrationForm=f}
+			:display"registration.html"
 	end};
 	{"^/help/?$"; function ()
-		luv:assign{title="Помощь"}
-		luv:display"help.html"
+		templater
+			:assign{title="Помощь"}
+			:display"help.html"
 	end};
 	{"^/?$"; requireAuth % function (urlConf, user)
 		local request = urlConf:request()
@@ -323,13 +325,14 @@ return {
 		tasksFilterForm:initForm(request:session())
 		logsFilterForm:initForm(request:session())
 		optionsForm:initForm(user.options)
-		luv:assign{
-			title="main";user=user;createTaskForm=createTaskForm;
-			tasksFilterForm=tasksFilterForm;
-			logsFilterForm=logsFilterForm;optionsForm=optionsForm;
-			reportForm=app.forms.Report();
-		}
-		luv:display"main.html"
+		templater
+			:assign{
+				title="main";user=user;createTaskForm=createTaskForm;
+				tasksFilterForm=tasksFilterForm;
+				logsFilterForm=logsFilterForm;optionsForm=optionsForm;
+				reportForm=app.forms.Report();
+			}
+			:display"main.html"
 	end};
 	{"^/report/?$"; requireAuth % function (urlConf, user)
 		local f = app.forms.Report(urlConf:request():postData())
@@ -357,12 +360,13 @@ return {
 			endDate = os.time(endDate)
 			daysTotal = math.ceil((endDate-beginDate)/(24*60*60))+1
 		end
-		luv:assign{
-			math=math;
-			user=user;users=auth.models.User:all():value();tasks=tasks;
-			beginDate=beginDate;endDate=endDate;daysTotal=daysTotal;
-		}
-		luv:display"report.html"
+		templater
+			:assign{
+				math=math;
+				user=user;users=auth.models.User:all():value();tasks=tasks;
+				beginDate=beginDate;endDate=endDate;daysTotal=daysTotal;
+			}
+			:display"report.html"
 	end};
 	{"^/cron/daily/u29dbsl30ocnsl$"; function (urlConf)
 		local i18nByEmail = {}

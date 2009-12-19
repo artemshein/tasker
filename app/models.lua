@@ -67,7 +67,7 @@ local Options = models.Model:extend{
 	user = references.OneToOne{references=auth.models.User;required=true};
 	tasksPerPage = fields.Int{label="tasks per page";defaultValue=10;required=true;choices={{10;10};{20;20};{30;30};{40;40};{50;50}}};
 	notifFreq = fields.Int{label="frequency of notifications";defaultValue=24*60*60;required=true;choices={{0;("never"):tr()};{60*60;("once an hour"):tr()};{24*60*60;("once a day"):tr()};{7*24*60*60;("once a week"):tr()}}};
-	lang = fields.Text{label="language";required=true;choices={{"en";"English"};{"ru";"Русский"}}};
+	lang = fields.Text{label="language";required=true;defaultValue="ru";choices={{"en";"English"};{"ru";"Русский"}}};
 }
 
 local Notification = models.Model:extend{
