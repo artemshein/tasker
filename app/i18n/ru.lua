@@ -45,7 +45,6 @@ February="февраля";
 ["Fill in only if you want to change password."]="Заполните только если хотите сменить пароль.";
 filter="отфильтровать";
 ["forgot password"]="забыл пароль";
-["from date"]="начиная с даты";
 ["frequency of notifications"]="частота оповещений";
 ["full name"]="полное имя";
 ["full report"]="полный отчет";
@@ -110,6 +109,7 @@ status="статус";
 ["sign out"]="выйти";
 ["sign up"]="регистрация";
 ['Sign up complete. Now you can <a href="/">sign in</a>.']='Регистрация завершена. Теперь вы можете <a href="/">войти</a>.';
+["since date"]="начиная с даты";
 -- T
 task="задача";
 tasks="задачи";

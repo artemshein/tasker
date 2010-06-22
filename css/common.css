@@ -23,6 +23,7 @@ input.time.ajax,input.date.ajax{border:none;background:none}
 input.error, select.error, textarea.error{background-color:#FDD !important;border:solid 1px #F00 !important;padding:2px;margin:2px 0}
 .inlineEditValue{margin:0 4px}
 .emptyInlineEditValue{white-space:pre-wrap}
+span.fieldHint{margin:4px}
 
 div.ui-accordion-content{padding:12px 16px !important}
 
@@ -36,6 +37,9 @@ div.pages span{padding: 4px 8px;background:#FA0;margin-left:10px;color:#FFF}
 div.pages a{margin-left:10px;text-decoration:none}
 
 #tasksFilter,#logsFilter{margin-bottom:4px}
+
+#tasksFilter table,#logsFilter table{width:0}
+#tasksFilter table td,#logsFilter table td{padding:0}
 
 #tasks table,#logs table,#notifications table{border-collapse:collapse}
 #tasks table td,#logs table td,#notifications table td{border:solid 1px #CCC;background-color:#FFF;padding:2px 6px}

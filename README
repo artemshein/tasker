@@ -1,4 +1,4 @@
-Tasker ver.0.5alpha
+Tasker ver. 1b.0 (beta)
 ===================
 
 Tasker is tasks management web-service. Tasker is designed for not big
@@ -28,9 +28,12 @@ secretSalt = "asd*#35&5sfds#!a*&@fknd^f8572@2rg6#2,ei||32fbDHWQ&*$^"
 mailServer = "mail.gmail.com"
 -- email notifier "From" field
 mailFrom = "tasker.notifier@example.com"
+-- administrator's info
+administrator = {login = "temiy"; name = "Shein Artyom Alexandrovich"; password = "123456"}
 ------------------------------------------------------------------------
 2. Give rights on write to tmpDir & sessionsDir.
 3. Uncomment and edit the reinstall section in app/urls.lua (change
 administrator's name & password at least).
-4. Reinstall the system, go to http://<tasker base url>/reinstall.
-5. Comment the reinstall section back.
+4. Reinstall the system -- go to http://<tasker base url>/reinstall.
+5. Comment the reinstall section back & remove your administrator's
+account data from config.lua.

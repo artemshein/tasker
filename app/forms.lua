@@ -58,8 +58,8 @@ local SignUp = forms.Form:extend{
 	__tag = .....".SignUp";
 	Meta = {fields={"login";"password";"repeatPassword";"name";"email"}};
 	login = auth.models.User:field"login":clone();
-	password = fields.Password{required=true;label="password"};
-	repeatPassword = fields.Password{required=true;label="repeat password"};
+	password = fields.Password{true; "password"};
+	repeatPassword = fields.Password{true; "repeat password"};
 	name = auth.models.User:field"name":clone():required(true):label"full name";
 	email = auth.models.User:field"email":clone():required(true);
 	register = fields.Submit(("register"):tr():capitalize());
@@ -85,11 +85,11 @@ local TasksFilter = forms.Form:extend{
 		action="/ajax/task/filter-list.json";
 		ajax='{success: onTasksFilter, dataType: "json"}';
 		fields={"title";"status";"self"};
-		widget=require"luv.forms.widgets".Flow();
+		widget=require"luv.forms.widgets".HorisontalTable();
 	};
-	title = fields.Text{label=("in title"):tr():capitalize()};
+	title = fields.Text{("in title"):tr():capitalize()};
 	status = fields.Text{
-		label=("status"):tr():capitalize();
+		("status"):tr():capitalize();
 		choices={
 			{"new";("new"):tr()};
 			{"inProgress";("in progress"):tr()};
@@ -98,7 +98,7 @@ local TasksFilter = forms.Form:extend{
 		};
 		widget=require"luv.fields.widgets".Select();
 	};
-	self = fields.Boolean{label="only that for me";defaultValue=false};
+	self = fields.Boolean{"only that for me"; default=false};
 	filter = fields.Submit(("filter"):tr():capitalize());
 	initModel = function (self, session)
 		session.tasksFilter = {title=self.title;status=self.status;self=self.self}
@@ -118,17 +118,17 @@ local LogsFilter = forms.Form:extend{
 		action="/ajax/log/filter-list.json";
 		ajax='{success: onLogsFilter, dataType: "json"}';
 		fields={"act";"mine"};
-		widget=require"luv.forms.widgets".Flow();
+		widget=require"luv.forms.widgets".HorisontalTable();
 	};
 	act = fields.Text{
-		label = ("action"):tr():capitalize();
+		("action"):tr():capitalize();
 		choices = {
 			{"create";("creating"):tr()};
 			{"edit";("editing"):tr()};
 			{"delete";("deleting"):tr()};
 		};
 	};
-	mine = fields.Boolean{label="my actions only";defaultValue=false};
+	mine = fields.Boolean{"my actions only"; default=false};
 	filter = fields.Submit(("filter"):tr():capitalize());
 	initModel = function (self, session)
 		session.logsFilter = {action=self.act;mine=self.mine}
@@ -151,9 +151,9 @@ local Options = forms.ModelForm:extend{
 	};
 	fullName = auth.models.User:field"name":clone():required(true):label"full name";
 	email = auth.models.User:field"email":clone():required(true);
-	newPassword = fields.Password{label="new password";hint="Fill in only if you want to change password."};
-	newPassword2 = fields.Password{label="repeat new password";hint="Fill in only if you want to change password."};
-	password = fields.Password{required=true;label="current password"};
+	newPassword = fields.Password{"new password"; hint="Fill in only if you want to change password."};
+	newPassword2 = fields.Password{"repeat new password"; hint="Fill in only if you want to change password."};
+	password = fields.Password{true; "current password"};
 	apply = fields.Submit(("apply"):tr():capitalize());
 	initForm = function (self, options)
 		forms.ModelForm.initForm(self, options)
@@ -168,10 +168,10 @@ local Report = forms.Form:extend{
 		fields={"from";"till";"self";"activeOnly"};
 		action="/report";
 	};
-	from = fields.Date{label="from date"};
-	till = fields.Date{label="till date"};
-	self = fields.Boolean{label="only that for me";defaultValue=false};
-	activeOnly = fields.Boolean{label="only active tasks";defaultValue=false};
+	from = fields.Date{"since date"};
+	till = fields.Date{"till date"};
+	self = fields.Boolean{"only that for me";default=false};
+	activeOnly = fields.Boolean{"only active tasks";default=false};
 	report = fields.Submit(("report"):tr():capitalize())
 }
 

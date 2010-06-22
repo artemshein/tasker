@@ -20,15 +20,15 @@ local Task = models.Model:extend{
 	_doneStatuses = {"done";"finished";"completed";"сделано";"сделан";"сделана";"готово";"готова";"готов";"завершено";"закончено";"закончена";"закончен";"выполнено";"выполнена"};
 	doneStatuses = property"table";
 	Meta = {labels={"task";"tasks"}};
-	title = fields.Text{required=true;label="title";classes={"big"}};
-	description = fields.Text{maxLength=false;label="description"}:addClasses{"huge"};
+	title = fields.Text{true; "title"; classes={"big"}};
+	description = fields.Text{max=false; "description"}:addClasses{"huge"};
 	dateCreated = fields.Datetime{autoNow=true};
-	createdBy = references.ManyToOne{references=auth.models.User;required=true;choices=auth.models.User:all()}:ajaxWidget(widgets.Select());
-	assignedTo = references.ManyToOne{references=auth.models.User;label="executor";choices=auth.models.User:all()}:ajaxWidget(widgets.Select());
-	dateToBeDone = fields.Date{label="term (date)"};
-	timeToBeDone = fields.Time{label="term (time)"};
-	important = fields.Boolean{label="priority task";defaultValue=false};
-	status = fields.Text{label="current state";defaultValue=("new"):tr()}:addClass"tiny";
+	createdBy = references.ManyToOne{auth.models.User; true; choices=auth.models.User:all()}:ajaxWidget(widgets.Select());
+	assignedTo = references.ManyToOne{auth.models.User; "executor"; choices=auth.models.User:all()}:ajaxWidget(widgets.Select());
+	dateToBeDone = fields.Date"term (date)";
+	timeToBeDone = fields.Time"term (time)";
+	important = fields.Boolean{"priority task"; default = false};
+	status = fields.Text{"current state"; default = ("new"):tr()}:addClass"tiny";
 	isNew = function (self)
 		if not self.status or table.ifind(self:newStatuses(), self.status:lower()) then
 			return true
@@ -64,19 +64,19 @@ local Log = models.Model:extend{
 local Options = models.Model:extend{
 	__tag = .....".Options";
 	Meta = {labels={"options";"options"}};
-	user = references.OneToOne{references=auth.models.User;required=true};
-	tasksPerPage = fields.Int{label="tasks per page";defaultValue=10;required=true;choices={{10;10};{20;20};{30;30};{40;40};{50;50}}};
-	notifFreq = fields.Int{label="frequency of notifications";defaultValue=24*60*60;required=true;choices={{0;("never"):tr()};{60*60;("once an hour"):tr()};{24*60*60;("once a day"):tr()};{7*24*60*60;("once a week"):tr()}}};
-	lang = fields.Text{label="language";required=true;defaultValue="ru";choices={{"en";"English"};{"ru";"Русский"}}};
+	user = references.OneToOne{auth.models.User; true};
+	tasksPerPage = fields.Int{"tasks per page"; default=10; true; choices={{10;10};{20;20};{30;30};{40;40};{50;50}}};
+	notifFreq = fields.Int{"frequency of notifications"; default=24*60*60; true; choices={{0;("never"):tr()};{60*60;("once an hour"):tr()};{24*60*60;("once a day"):tr()};{7*24*60*60;("once a week"):tr()}}};
+	lang = fields.Text{"language"; true; default="ru"; choices={{"en";"English"};{"ru";"Русский"}}};
 }
 
 local Notification = models.Model:extend{
 	__tag = .....".Notification";
 	Meta = {labels={"notification";"notifications"}};
-	to = references.ManyToOne{references=auth.models.User;required=true};
+	to = references.ManyToOne{auth.models.User; true};
 	dateCreated = fields.Datetime{autoNow=true};
 	dateSended = fields.Datetime();
-	text = fields.Text{maxLength=false;required=true};
+	text = fields.Text{max=false; true};
 }
 
 return {Task=Task;Log=Log;Options=Options;admin={Task;Log};Notification=Notification}

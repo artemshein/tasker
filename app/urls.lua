@@ -6,7 +6,7 @@ local fields = require"luv.fields"
 local models = require"luv.db.models"
 local Q = models.Q
 local app = {models=require"app.models";forms=require"app.forms"}
-local ws = require"luv.webservers"
+local http = require"luv.http"
 local json = require"luv.utils.json"
 local utils = require"luv.utils"
 local fs = require"luv.fs"
@@ -73,8 +73,11 @@ return {
 		if manager:currentMigration() ~= manager:lastMigration() then
 			manager:markAllUp()
 		end
-		local temiy = auth.models.User:create{login="temiy";name="Шеин Артём Александрович";passwordHash=auth.models.User:encodePassword "123456"}
-		app.models.Options:create{user=temiy}
+		-- Global administrator data
+		-- Hash administrator's password
+		administrator.passwordHash = auth.models.User:encodePassword(administrator.password)
+		local admin = auth.models.User:create(administrator)
+		app.models.Options:create{user=admin}
 		templater:displayString "{{ safe(debugger) }}OK"
 	end};
 	--{"^/admin"; require"luv.contrib.admin".AdminSite(luv, require"luv.contrib.auth".modelsAdmins(), app.models.admin):urls()};
@@ -102,7 +105,7 @@ return {
 				-- Filtered tasks list
 				local findTasksForm = app.forms.FindTasks(request:postData())
 				if not findTasksForm:submitted() or not findTasksForm:valid() then
-					ws.Http403()
+					http.Http403()
 				end
 				local p = models.Paginator(app.models.Task, user.options and user.options.tasksPerPage or 10):order"-dateCreated"
 				local page = tonumber(request:post"page") or 1
@@ -168,7 +171,7 @@ return {
 					end
 				end)
 				if not res then
-					ws.Http403()
+					http.Http403()
 				end
 			end};
 			{"^/delete%.json$"; requireAuth % function (urlConf, user)
@@ -192,7 +195,7 @@ return {
 			{"^/(%d+)/save.json"; requireAuth % function (urlConf, user, taskId)
 				local task = app.models.Task:find(taskId)
 				if not task then
-					ws.Http404()
+					http.Http404()
 				end
 				local f = app.forms.EditTask(urlConf:request():postData())
 				f:processAjaxForm(function (self)
@@ -223,7 +226,7 @@ return {
 				local request = urlConf:request()
 				local findLogsForm = app.forms.FindLogs(request:postData())
 				if not findLogsForm:submitted() or not findLogsForm:valid() then
-					ws.Http403()
+					http.Http403()
 				end
 				local p = models.Paginator(app.models.Log, 50):order"-dateTime"
 				local page = tonumber(request:post"page") or 1
@@ -284,7 +287,7 @@ return {
 	}};
 	{"^/task/(%d+)/?$"; requireAuth % function (urlConf, user, taskId)
 		local task = app.models.Task:find(taskId)
-		if not task then ws.Http404() end
+		if not task then http.Http404() end
 		local f = app.forms.EditTask()
 		f:htmlAction("/ajax/task/"..taskId.."/save.json")
 		f:initForm(task)
@@ -337,7 +340,7 @@ return {
 	{"^/report/?$"; requireAuth % function (urlConf, user)
 		local f = app.forms.Report(urlConf:request():postData())
 		if not f:submitted() or not f:valid() then
-			ws.Http403()
+			http.Http403()
 		end
 		local tasks = app.models.Task:all():order"dateCreated"
 		if 1 == f.activeOnly then

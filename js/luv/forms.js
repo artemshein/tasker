@@ -28,7 +28,7 @@
 	jQuery.fn.ajaxField = function (url, id, field, callback)
 	{
 		var self = this;
-		this.addClass("ajaxField");
+		this.addClass("ajax");
 		function commitChanges () {
 			var currentValue = self.fieldRawVal();
 			if (currentValue != self.data("lastValue"))
@@ -64,38 +64,41 @@
 		if (this.is(":checkbox"))
 			this.change(commitChanges).change();
 		else if (this.hasClass("hasDatepicker"))
-			this.change(commitChanges).blur(commitChanges);
+			this.change(commitChanges).addClass("ajax");
 		else
-			this.blur(commitChanges).blur();
+			this.blur(commitChanges).keypress(function (e) {
+				if (e.which == 13)
+					commitChanges();
+			}).blur();
 		return this;
 	};
 	jQuery.fn.inlineEditAjaxField = function (url, id, field, callback)
 	{
-		var self = this;
-		var value = jQuery("#"+this.attr("id")+"Value");
-		function setValue (text) {
-			if (!text || text.length == 0)
-			{
-				value.addClass("emptyInlineEditValue");
-				text = "                ";
-			}
-			value.text(text);
+		function setValue (self, val)
+		{
+			self.text(val);
+			if (val)
+				self.removeClass("emptyInlineEditValue");
+			else
+				self.addClass("emptyInlineEditValue");
 		}
-		function newCallback (self, field, currentValue) {
-			if (callback)
-				callback(self, field, currentValue);
-			self.hide();
-			setValue(self.fieldVal());
-			value.show();
+		var value = jQuery("#"+this.attr("id")+"Value").addClass("inlineEditValue");
+		var self = this;
+		var newCallback = function (self, field, currentValue) {
+			if (!callback || callback(self, field, currentValue))
+			{
+				self.hide();
+				setValue(value, self.fieldVal());
+				value.show();
+			}
 		}
 		this.ajaxField(url, id, field, newCallback);
-		setValue(this.fieldVal());
+		setValue(value, self.fieldVal());
 		value.click(function () {
-			self.show().focus();
 			value.hide();
+			self.show().focus().select();
 		});
-		this.removeClass("ajaxField").addClass("inlineEditAjaxField").hide();
-		value.addClass("inlineEditValue");
+		this.hide();
 	};
 	jQuery.fn.hideError = function ()
 	{
